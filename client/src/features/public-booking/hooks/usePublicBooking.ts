@@ -183,12 +183,22 @@ export const usePublicBooking = () => {
       return
     }
 
+    if (!ownerId) {
+      notifications.show({
+        title: 'Ошибка',
+        message: 'Не указан владелец. Откройте страницу бронирования по ссылке.',
+        color: 'red'
+      })
+      return
+    }
+
     try {
       await createBookingMutation.mutateAsync({
         clientName,
         clientContact,
         date: selectedDate,
-        time: selectedTime
+        time: selectedTime,
+        ownerId
       })
 
       notifications.show({

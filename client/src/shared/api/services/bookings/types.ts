@@ -15,6 +15,7 @@ export interface CreateBookingPayload {
   clientContact: string
   date: string
   time: string
+  ownerId?: string
 }
 
 export interface UpdateBookingStatusPayload {
