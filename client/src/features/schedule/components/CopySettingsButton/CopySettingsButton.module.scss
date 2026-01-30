@@ -1,0 +1,14 @@
+.copyButton {
+	font-size: 12px;
+	padding: 4px 8px;
+	height: auto;
+	min-height: auto;
+	
+	:global(.mantine-Button-leftSection) {
+		margin-right: 4px;
+	}
+	
+	:global(.mantine-Button-rightSection) {
+		margin-left: 4px;
+	}
+}

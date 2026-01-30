@@ -1,0 +1,152 @@
+.dayCard {
+	padding: 20px;
+	border: 1px solid var(--border-color);
+	border-radius: 12px;
+	background-color: var(--bg-secondary);
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	position: relative;
+	overflow: hidden;
+
+	@media (max-width: 768px) {
+		padding: 16px 14px;
+		border-radius: 10px;
+	}
+	
+	&::before {
+		content: '';
+		position: absolute;
+		left: 0;
+		top: 0;
+		bottom: 0;
+		width: 2px;
+		background: transparent;
+		transition: all 0.3s ease;
+		opacity: 0;
+	}
+	
+	&:hover {
+		border-color: rgba(77, 171, 247, 0.3);
+		box-shadow: 0 2px 6px rgba(77, 171, 247, 0.08);
+		
+		&::before {
+			background: rgba(77, 171, 247, 0.4);
+			opacity: 1;
+		}
+	}
+	
+	&.dayCardActive {
+		border-color: rgba(77, 171, 247, 0.25);
+		background-color: var(--bg-secondary);
+		box-shadow: 0 1px 3px rgba(77, 171, 247, 0.1);
+		
+		&::before {
+			background: rgba(77, 171, 247, 0.5);
+			opacity: 1;
+		}
+	}
+
+	&.weekendCard {
+		&.dayCardActive {
+			background-color: var(--bg-secondary);
+			border-color: rgba(255, 193, 7, 0.2);
+			
+			&::before {
+				background: rgba(255, 193, 7, 0.4);
+				opacity: 1;
+			}
+		}
+		
+		&:hover {
+			border-color: rgba(255, 193, 7, 0.25);
+		}
+	}
+}
+
+.dayHeader {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 0;
+	gap: 12px;
+	
+	:global(.mantine-Checkbox-label) {
+		font-size: 16px;
+		font-weight: 600;
+		color: var(--text-primary);
+		cursor: pointer;
+		transition: color 0.2s ease;
+	}
+	
+	:global(.mantine-Checkbox-input:checked) ~ :global(.mantine-Checkbox-label) {
+		color: var(--primary);
+	}
+}
+
+.dayIcon {
+	color: var(--text-secondary);
+	transition: all 0.2s ease;
+	flex-shrink: 0;
+	
+	.dayCardActive & {
+		color: var(--primary);
+	}
+	
+	.dayCard:hover & {
+		color: var(--primary);
+		transform: scale(1.1);
+	}
+}
+
+.activeBadge {
+	padding: 6px 12px;
+	background: rgba(77, 171, 247, 0.15);
+	color: var(--primary);
+	border: 1px solid rgba(77, 171, 247, 0.2);
+	border-radius: 6px;
+	font-size: 13px;
+	font-weight: 500;
+	white-space: nowrap;
+	transition: all 0.2s ease;
+	
+	&:hover {
+		background: rgba(77, 171, 247, 0.2);
+		border-color: rgba(77, 171, 247, 0.3);
+	}
+}
+
+.dayFields {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	margin-top: 20px;
+	padding-top: 20px;
+	border-top: 1px solid var(--border-color);
+	animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+	
+	@media (max-width: 768px) {
+		gap: 14px;
+		margin-top: 14px;
+		padding-top: 14px;
+	}
+}
+
+.addBlockButton {
+	margin-top: 8px;
+	transition: all 0.2s ease;
+	
+	&:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 4px 8px rgba(77, 171, 247, 0.2);
+	}
+}
+
+@keyframes fadeInUp {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}

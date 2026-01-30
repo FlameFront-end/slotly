@@ -1,0 +1,22 @@
+.modeSelector {
+	margin-bottom: 8px;
+	padding-bottom: 16px;
+	border-bottom: 1px solid var(--border-color);
+	
+	:global(.mantine-SegmentedControl-root) {
+		background-color: var(--bg-tertiary);
+		border-radius: 8px;
+		padding: 2px;
+	}
+	
+	:global(.mantine-SegmentedControl-control) {
+		border-radius: 6px;
+		transition: all 0.2s ease;
+	}
+	
+	:global(.mantine-SegmentedControl-controlActive) {
+		background: linear-gradient(135deg, var(--primary) 0%, rgba(77, 171, 247, 0.9) 100%);
+		color: white;
+		box-shadow: 0 2px 4px rgba(77, 171, 247, 0.3);
+	}
+}

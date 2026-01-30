@@ -1,0 +1,131 @@
+.schedule {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 24px 100px;
+
+  @media (max-width: 768px) {
+    padding: 16px 12px 100px;
+  }
+}
+
+.header {
+  margin-bottom: 32px;
+  animation: fadeInUp 0.5s ease-out;
+
+  @media (max-width: 768px) {
+    margin-bottom: 20px;
+  }
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+
+  @media (max-width: 768px) {
+    font-size: 24px;
+    margin-bottom: 6px;
+  }
+}
+
+.subtitle {
+  font-size: 16px;
+  color: var(--text-secondary);
+  font-weight: 400;
+  margin-bottom: 12px;
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+}
+
+.activeDaysInfo {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-top: 8px;
+
+  .activeDaysCount {
+    color: var(--primary);
+    font-weight: 600;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  @media (max-width: 768px) {
+    gap: 14px;
+  }
+}
+
+.days {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  @media (max-width: 768px) {
+    gap: 20px;
+  }
+}
+
+.dayGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  @media (max-width: 768px) {
+    gap: 12px;
+  }
+}
+
+.groupLabel {
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 12px;
+  padding-left: 4px;
+}
+
+
+.actions {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin-top: 32px;
+  padding: 24px 0;
+  background-color: var(--bg-primary);
+  z-index: 10;
+
+  @media (max-width: 768px) {
+    padding: 20px 0;
+    margin-top: 24px;
+  }
+
+  :global(.mantine-Button-root) {
+    box-shadow: 0 2px 8px rgba(77, 171, 247, 0.2);
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(77, 171, 247, 0.3);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+  }
+}
+
+.loading {
+  text-align: center;
+  padding: 60px 20px;
+}

@@ -1,0 +1,14 @@
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.socialLinkCard {
+	background-color: var(--bg-tertiary);
+	transition: all 0.2s ease;
+
+	&:hover {
+		background-color: var(--bg-secondary);
+	}
+}

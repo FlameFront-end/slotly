@@ -1,0 +1,319 @@
+.layout {
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
+
+.header {
+	position: sticky;
+	top: 0;
+	z-index: 100;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 24px;
+	height: 64px;
+	min-height: 64px;
+	background-color: var(--bg-secondary);
+	border-bottom: 1px solid var(--border-color);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+	backdrop-filter: blur(10px);
+	transition: all 0.3s ease;
+
+	@media (max-width: 768px) {
+		padding: 0 16px;
+		height: 56px;
+		min-height: 56px;
+	}
+}
+
+.logo {
+	display: flex;
+	align-items: center;
+	text-decoration: none;
+	transition: transform 0.2s ease;
+
+	&:hover {
+		transform: scale(1.05);
+	}
+
+	&:active {
+		transform: scale(0.98);
+	}
+}
+
+.logoText {
+	font-size: 20px;
+	font-weight: 700;
+	background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	transition: all 0.3s ease;
+
+	@media (max-width: 768px) {
+		font-size: 18px;
+	}
+}
+
+.nav {
+	position: relative;
+	display: flex;
+	align-items: center;
+
+	@media (max-width: 768px) {
+		display: none;
+	}
+}
+
+.navGroup {
+	@media (max-width: 768px) {
+		display: none;
+	}
+}
+
+.indicator {
+	position: absolute;
+	bottom: -2px;
+	height: 2px;
+	background-color: var(--primary);
+	border-radius: 2px;
+	transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+	pointer-events: none;
+	z-index: 10;
+}
+
+.navLink {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 8px 16px;
+	color: var(--text-secondary);
+	text-decoration: none;
+	font-size: 14px;
+	font-weight: 500;
+	border-radius: var(--border-radius);
+	transition: color 0.3s ease;
+	overflow: visible;
+
+	&::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: var(--bg-tertiary);
+		opacity: 0;
+		transition: opacity 0.2s ease;
+		border-radius: var(--border-radius);
+	}
+
+	&:hover {
+		color: var(--text-primary);
+
+		&::before {
+			opacity: 1;
+		}
+
+		.navLinkText {
+			transform: translateX(2px);
+		}
+	}
+
+	&:active {
+		transform: translateY(0);
+	}
+}
+
+.navLinkText {
+	position: relative;
+	z-index: 1;
+	transition: transform 0.2s ease;
+}
+
+.active {
+	color: var(--primary);
+
+	.navLinkText {
+		font-weight: 600;
+	}
+}
+
+.headerActions {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.logoutButton {
+	transition: all 0.2s ease;
+
+	&:hover {
+		transform: translateY(-1px);
+		box-shadow: var(--shadow-md);
+	}
+
+	&:active {
+		transform: translateY(0);
+	}
+
+	@media (max-width: 768px) {
+		display: none;
+	}
+}
+
+.burger {
+	color: var(--text-primary);
+	display: none;
+
+	@media (max-width: 768px) {
+		display: block;
+	}
+}
+
+.mobileMenuContent {
+	padding: 0;
+}
+
+.mobileNavLink {
+	position: relative;
+	display: block;
+	padding: 0;
+	color: var(--text-secondary);
+	text-decoration: none;
+	border-radius: 12px;
+	transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+	overflow: hidden;
+	margin-bottom: 4px;
+
+	&:active {
+		transform: scale(0.98);
+	}
+
+	&::before {
+		content: '';
+		position: absolute;
+		left: 0;
+		top: 0;
+		bottom: 0;
+		width: 0;
+		background-color: var(--primary);
+		opacity: 0.1;
+		transition: width 0.2s ease;
+		z-index: 0;
+	}
+
+	&:hover::before {
+		width: 100%;
+	}
+}
+
+.mobileNavLinkContent {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding: 16px 20px;
+	border-radius: 12px;
+	transition: all 0.2s ease;
+	position: relative;
+	z-index: 1;
+}
+
+.mobileNavIcon {
+	color: var(--text-secondary);
+	transition: all 0.2s ease;
+	flex-shrink: 0;
+}
+
+.mobileNavLinkText {
+	font-size: 16px;
+	font-weight: 500;
+	transition: all 0.2s ease;
+	flex: 1;
+}
+
+.mobileNavLink:hover:not(.active) {
+	.mobileNavLinkContent {
+		background-color: var(--bg-tertiary);
+	}
+
+	.mobileNavIcon,
+	.mobileNavLinkText {
+		color: var(--text-primary);
+	}
+}
+
+.mobileNavLink.active {
+	.mobileNavLinkContent {
+		background: linear-gradient(90deg, rgba(77, 171, 247, 0.15) 0%, rgba(77, 171, 247, 0.05) 50%, transparent 100%);
+		border-left: 3px solid var(--primary);
+		padding-left: 17px; // 20px - 3px border
+		box-shadow: inset 0 0 20px rgba(77, 171, 247, 0.05);
+	}
+
+	.mobileNavIcon {
+		color: var(--primary);
+		transform: scale(1.1);
+	}
+
+	.mobileNavLinkText {
+		color: var(--primary);
+		font-weight: 600;
+		letter-spacing: 0.2px;
+	}
+
+	&::before {
+		width: 100%;
+		opacity: 0.15;
+	}
+}
+
+.mobileLogoutButton {
+	margin-top: 12px;
+	padding: 14px 24px;
+	font-weight: 500;
+	font-size: 15px;
+	border: 1.5px solid var(--border-color);
+	border-radius: 12px;
+	transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+	background-color: transparent;
+
+	&:hover {
+		background-color: rgba(255, 107, 107, 0.1);
+		border-color: var(--danger);
+		color: var(--danger);
+		transform: translateY(-2px);
+		box-shadow: 0 4px 16px rgba(255, 107, 107, 0.2);
+	}
+
+	&:active {
+		transform: translateY(0);
+		box-shadow: 0 2px 8px rgba(255, 107, 107, 0.15);
+	}
+}
+
+.main {
+	flex: 1;
+	background-color: var(--bg-primary);
+	animation: fadeIn 0.3s ease-in-out;
+
+	@media (max-width: 768px) {
+		// Уменьшаем отступы для контента на мобильных
+		:global(.mantine-Card-root) {
+			margin-bottom: 16px;
+		}
+	}
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
