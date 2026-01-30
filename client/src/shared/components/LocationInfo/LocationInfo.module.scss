@@ -3,6 +3,14 @@
 	flex-direction: column;
 	gap: 10px;
 	margin-top: 12px;
+	width: 100%;
+}
+
+.linksGroup {
+	width: 100%;
+	flex-wrap: wrap;
+	max-width: 100%;
+	overflow: hidden;
 }
 
 .address {
@@ -30,10 +38,26 @@
 	border: 1px solid rgba(77, 171, 247, 0.2);
 	border-radius: 8px;
 	transition: all 0.2s ease;
+	max-width: 100%;
+	min-width: 0;
+	flex-shrink: 1;
+	flex: 0 1 auto;
+	overflow: hidden;
+	box-sizing: border-box;
 
 	&:hover {
 		background-color: rgba(77, 171, 247, 0.15);
 		border-color: rgba(77, 171, 247, 0.4);
 		transform: translateY(-1px);
+	}
+
+	span {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		display: block;
+		max-width: 100%;
+		min-width: 0;
+		flex: 1 1 auto;
 	}
 }

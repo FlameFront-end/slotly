@@ -92,8 +92,8 @@ export const BookingForm: FC<Props> = ({
 	const [currentMonth, setCurrentMonth] = useState(() => dayjs().startOf('month'))
 
 	const calendarDates = useMemo(() => {
-		const start = currentMonth.startOf('month').startOf('week').add(1, 'day')
-		const end = currentMonth.endOf('month').endOf('week').add(1, 'day')
+		const start = currentMonth.startOf('month').startOf('week')
+		const end = currentMonth.endOf('month').endOf('week')
 		const dates: dayjs.Dayjs[] = []
 		let date = start
 		while (date.isBefore(end) || date.isSame(end, 'day')) {

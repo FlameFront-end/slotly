@@ -11,21 +11,21 @@ interface ModeSelectorProps {
 export const ModeSelector: FC<ModeSelectorProps> = ({ mode, onChange }) => {
 	return (
 		<div className={s.modeSelector}>
-			<Text size="sm" fw={500} mb="xs">Режим настройки:</Text>
+			<Text size="sm" fw={500} mb="xs">Режим расписания:</Text>
 			<SegmentedControl
 				value={mode}
 				onChange={(value) => onChange(value as 'simple' | 'advanced')}
 				data={[
-					{ label: 'Простой', value: 'simple' },
-					{ label: 'Расширенный', value: 'advanced' }
+					{ label: 'Обычный день', value: 'simple' },
+					{ label: 'Интервалы', value: 'advanced' }
 				]}
 				size="sm"
 				fullWidth
 			/>
 			<Text size="xs" c="dimmed" mt="xs">
-				{mode === 'simple' 
-					? 'Настройте начало и конец рабочего дня'
-					: 'Настройте несколько временных блоков с разными параметрами'}
+				{mode === 'simple'
+					? 'Клиент сможет записаться на любое время внутри этого диапазона'
+					: 'Добавьте отдельные интервалы приема в течение дня'}
 			</Text>
 		</div>
 	)

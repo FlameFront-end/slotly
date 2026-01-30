@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
+import dayjs from 'dayjs'
 import { notifications } from '@mantine/notifications'
 
 import { useSchedule, useUpdateSchedule } from '@/shared/api/services/schedule'
 import { getErrorMessage } from '@/shared/lib'
-import { type ScheduleDay, type TimeBlock } from '@/shared/api/services/schedule/types'
+import { type ScheduleDay, type ScheduleException, type TimeBlock } from '@/shared/api/services/schedule/types'
 import { migrateScheduleDay, DAYS_OF_WEEK, createDefaultSchedule } from '../utils/schedule.utils'
 
 export const useScheduleForm = () => {
@@ -13,23 +14,37 @@ export const useScheduleForm = () => {
 	const [days, setDays] = useState<ScheduleDay[]>([])
 	const [dayModes, setDayModes] = useState<Record<number, 'simple' | 'advanced'>>({})
 	const [copiedDayIndex, setCopiedDayIndex] = useState<number | null>(null)
+	const [bookingRangeMonths, setBookingRangeMonths] = useState<number>(2)
+	const [exceptions, setExceptions] = useState<ScheduleException[]>([])
 
 	useEffect(() => {
-		if (schedule) {
+		const defaultDays = createDefaultSchedule()
+		const defaultModes: Record<number, 'simple' | 'advanced'> = {}
+		DAYS_OF_WEEK.forEach((_, index) => {
+			defaultModes[index] = 'simple'
+		})
+
+		if (schedule && schedule.days && schedule.days.length > 0) {
 			const migratedDays = schedule.days.map(migrateScheduleDay)
-			setDays(migratedDays)
+			// Объединяем с днями по умолчанию, чтобы гарантировать наличие всех 7 дней
+			const daysMap = new Map<number, ScheduleDay>()
+			defaultDays.forEach(day => daysMap.set(day.dayOfWeek, day))
+			migratedDays.forEach(day => daysMap.set(day.dayOfWeek, day))
+			const allDays = Array.from(daysMap.values()).sort((a, b) => a.dayOfWeek - b.dayOfWeek)
+			
+			setDays(allDays)
+			setBookingRangeMonths(schedule.bookingRangeMonths || 2)
+			setExceptions(schedule.exceptions || [])
 			const modes: Record<number, 'simple' | 'advanced'> = {}
-			migratedDays.forEach(day => {
+			allDays.forEach(day => {
 				modes[day.dayOfWeek] = day.timeBlocks.length > 1 ? 'advanced' : 'simple'
 			})
 			setDayModes(modes)
 		} else {
-			setDays(createDefaultSchedule())
-			const defaultModes: Record<number, 'simple' | 'advanced'> = {}
-			DAYS_OF_WEEK.forEach((_, index) => {
-				defaultModes[index] = 'simple'
-			})
+			setDays(defaultDays)
 			setDayModes(defaultModes)
+			setBookingRangeMonths(2)
+			setExceptions([])
 		}
 	}, [schedule])
 
@@ -93,19 +108,39 @@ export const useScheduleForm = () => {
 		)
 	}
 
-	const addTimeBlock = (dayIndex: number): void => {
+	const parseTimeToMinutes = (time: string): number => {
+		const [hours, minutes] = time.split(':').map(Number)
+		return hours * 60 + minutes
+	}
+
+	const formatMinutesToTime = (totalMinutes: number): string => {
+		const clamped = Math.min(totalMinutes, 23 * 60 + 59)
+		const hours = Math.floor(clamped / 60)
+		const minutes = clamped % 60
+		return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
+	}
+
+	const addTimeBlocks = (dayIndex: number, count: number = 1, durationMinutes: number = 60): void => {
 		setDays(prev =>
 			prev.map((day, i) => {
 				if (i === dayIndex) {
-					const lastBlock = day.timeBlocks[day.timeBlocks.length - 1]
-					const newBlock: TimeBlock = {
-						startTime: lastBlock?.endTime || '09:00',
-						endTime: lastBlock?.endTime || '18:00',
-						slotDuration: lastBlock?.slotDuration || 60
+					const newBlocks = [...day.timeBlocks]
+					const lastBlock = newBlocks[newBlocks.length - 1]
+					const safeDuration = Number.isFinite(durationMinutes) && durationMinutes > 0 ? durationMinutes : 60
+					let startTime = lastBlock?.endTime || '09:00'
+
+					for (let idx = 0; idx < count; idx += 1) {
+						const endTime = formatMinutesToTime(parseTimeToMinutes(startTime) + safeDuration)
+						newBlocks.push({
+							startTime,
+							endTime,
+							slotDuration: safeDuration
+						})
+						startTime = endTime
 					}
 					return {
 						...day,
-						timeBlocks: [...day.timeBlocks, newBlock]
+						timeBlocks: newBlocks
 					}
 				}
 				return day
@@ -160,12 +195,43 @@ export const useScheduleForm = () => {
 		})
 	}
 
+	const addExceptionDate = (date: string): void => {
+		setExceptions(prev => {
+			if (prev.some(item => item.date === date)) {
+				return prev
+			}
+			const dayOfWeek = dayjs(date).day()
+			const baseDay = days.find(day => day.dayOfWeek === dayOfWeek)
+			const baseBlock = baseDay?.timeBlocks?.[0]
+			const newException: ScheduleException = {
+				id: `exception-${date}`,
+				date,
+				isAvailable: true,
+				startTime: baseBlock?.startTime || '09:00',
+				endTime: baseBlock?.endTime || '18:00'
+			}
+			return [...prev, newException].sort((a, b) => a.date.localeCompare(b.date))
+		})
+	}
+
+	const removeExceptionDate = (date: string): void => {
+		setExceptions(prev => prev.filter(item => item.date !== date))
+	}
+
+	const updateException = (date: string, patch: Partial<ScheduleException>): void => {
+		setExceptions(prev =>
+			prev.map(item => item.date === date ? { ...item, ...patch } : item)
+		)
+	}
+
 	const handleSubmit = async (e: React.FormEvent): Promise<void> => {
 		e.preventDefault()
 
 		try {
 			await updateMutation.mutateAsync({
-				days: days.map(({ id: _id, ...rest }) => rest)
+				days: days.map(({ id: _id, ...rest }) => rest),
+				bookingRangeMonths,
+				exceptions: exceptions.map(({ id: _id, ...rest }) => rest)
 			})
 			notifications.show({
 				title: 'Успешно',
@@ -186,12 +252,18 @@ export const useScheduleForm = () => {
 		days,
 		dayModes,
 		copiedDayIndex,
+		bookingRangeMonths,
+		setBookingRangeMonths,
+		exceptions,
+		addExceptionDate,
+		removeExceptionDate,
+		updateException,
 		isLoading,
 		updateMutation,
 		handleDayChange,
 		handleModeChange,
 		handleTimeBlockChange,
-		addTimeBlock,
+		addTimeBlocks,
 		removeTimeBlock,
 		copyDaySettings,
 		handleSubmit

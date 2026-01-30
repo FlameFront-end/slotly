@@ -14,18 +14,20 @@ export interface ScheduleDay {
 export interface ScheduleException {
 	id: string
 	date: string // YYYY-MM-DD
-	isAvailable: boolean
+	isAvailable?: boolean // По умолчанию true, если дата добавлена
 	startTime?: string
 	endTime?: string
 }
 
 export interface Schedule {
 	days: ScheduleDay[]
+	bookingRangeMonths?: number
 	exceptions: ScheduleException[]
 }
 
 export interface UpdateSchedulePayload {
 	days: Omit<ScheduleDay, 'id'>[]
+	bookingRangeMonths?: number
 	exceptions?: Omit<ScheduleException, 'id'>[]
 }
 

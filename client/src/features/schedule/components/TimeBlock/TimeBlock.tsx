@@ -1,5 +1,5 @@
 import { type FC } from 'react'
-import { TextInput, NumberInput, ActionIcon } from '@mantine/core'
+import { TextInput, ActionIcon } from '@mantine/core'
 import { IconTrash } from '@tabler/icons-react'
 
 import { type TimeBlock as TimeBlockType } from '@/shared/api/services/schedule/types'
@@ -27,7 +27,7 @@ export const TimeBlock: FC<TimeBlockProps> = ({
 		<div className={s.timeBlock}>
 			{mode === 'advanced' && totalBlocks > 1 && (
 				<div className={s.timeBlockHeader}>
-					<span className={s.timeBlockLabel}>Блок {blockIndex + 1}</span>
+					<span className={s.timeBlockLabel}>Интервал {blockIndex + 1}</span>
 					{onRemove && (
 						<ActionIcon
 							color="red"
@@ -43,7 +43,7 @@ export const TimeBlock: FC<TimeBlockProps> = ({
 			)}
 			<div className={s.timeBlockFields}>
 				<TextInput
-					label="Начало работы"
+					label="Начало приема"
 					type="time"
 					value={block.startTime}
 					onChange={e => onChange('startTime', e.target.value)}
@@ -51,27 +51,12 @@ export const TimeBlock: FC<TimeBlockProps> = ({
 				/>
 
 				<TextInput
-					label="Конец работы"
+					label="Конец приема"
 					type="time"
 					value={block.endTime}
 					onChange={e => onChange('endTime', e.target.value)}
 					size="sm"
 				/>
-
-				<div className={s.numberInputWrapper}>
-					<NumberInput
-						label="Длительность слота (мин)"
-						min={15}
-						max={480}
-						step={15}
-						value={block.slotDuration}
-						onChange={value => onChange('slotDuration', Number(value) || 60)}
-						size="sm"
-					/>
-					{blockIndex === 0 && (
-						<p className={s.fieldDescription}>Минимальная длительность: 15 минут</p>
-					)}
-				</div>
 			</div>
 		</div>
 	)

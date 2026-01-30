@@ -4,11 +4,10 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToOne,
   JoinColumn,
   ManyToOne,
 } from 'typeorm';
-import type { OwnerProfile } from '../../owner/entities/owner-profile.entity';
+import { OwnerProfile } from '../../owner/entities/owner-profile.entity';
 
 export interface TimeBlock {
   startTime: string; // HH:mm
@@ -31,15 +30,15 @@ export class Schedule {
   @Column({ name: 'owner_id', unique: true })
   ownerId: string;
 
-  @ManyToOne(
-    () => require('../../owner/entities/owner-profile.entity').OwnerProfile,
-    (profile: OwnerProfile) => profile.schedule,
-  )
+  @ManyToOne(() => OwnerProfile, (profile: OwnerProfile) => profile.schedule)
   @JoinColumn({ name: 'owner_id' })
   ownerProfile: OwnerProfile;
 
   @Column({ type: 'jsonb' })
   days: ScheduleDay[];
+
+  @Column({ type: 'int', name: 'booking_range_months', default: 2 })
+  bookingRangeMonths: number;
 
   @Column({ type: 'jsonb', default: [] })
   exceptions: unknown[];

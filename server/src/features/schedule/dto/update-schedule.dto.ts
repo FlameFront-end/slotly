@@ -9,6 +9,7 @@ import {
   Max,
   Matches,
   ArrayMinSize,
+  IsOptional,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -52,6 +53,36 @@ export class ScheduleDayDto {
   isActive: boolean;
 }
 
+export class ScheduleExceptionDto {
+  @ApiProperty({ example: '2026-01-30' })
+  @IsString()
+  @Matches(/^\d{4}-\d{2}-\d{2}$/, {
+    message: 'date must be in YYYY-MM-DD format',
+  })
+  date: string;
+
+  @ApiProperty({ required: false, example: true, default: true })
+  @IsOptional()
+  @IsBoolean()
+  isAvailable?: boolean;
+
+  @ApiProperty({ required: false, example: '09:00' })
+  @IsOptional()
+  @IsString()
+  @Matches(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/, {
+    message: 'startTime must be in HH:mm format',
+  })
+  startTime?: string;
+
+  @ApiProperty({ required: false, example: '18:00' })
+  @IsOptional()
+  @IsString()
+  @Matches(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/, {
+    message: 'endTime must be in HH:mm format',
+  })
+  endTime?: string;
+}
+
 export class UpdateScheduleDto {
   @ApiProperty({ type: [ScheduleDayDto] })
   @IsArray()
@@ -59,7 +90,17 @@ export class UpdateScheduleDto {
   @Type(() => ScheduleDayDto)
   days: ScheduleDayDto[];
 
+  @ApiProperty({ required: false, example: 2, description: 'На сколько месяцев вперед доступна запись' })
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  @Max(24)
+  bookingRangeMonths?: number;
+
   @ApiProperty({ required: false, default: [] })
+  @IsOptional()
   @IsArray()
-  exceptions?: unknown[];
+  @ValidateNested({ each: true })
+  @Type(() => ScheduleExceptionDto)
+  exceptions?: ScheduleExceptionDto[];
 }

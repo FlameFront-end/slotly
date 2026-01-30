@@ -70,18 +70,16 @@ const PublicBooking: FC = () => {
 			<div className={s.publicBooking}>
 				<div className={s.container}>
 					{ownerProfile && (
-						<Card className={s.ownerCard} padding="lg" radius="md" withBorder>
-							<Group gap="md" mb="md">
-								<IconBuilding size={32} stroke={1.5} />
-								<div style={{ flex: 1 }}>
-									<Text fw={600} size="lg">{ownerProfile.name}</Text>
-									{ownerProfile.description && (
-										<Text size="sm" c="dimmed" mt={4}>{ownerProfile.description}</Text>
-									)}
-									<LocationInfo address={ownerProfile.address} mapLink={ownerProfile.mapLink} website={ownerProfile.website} />
-								</div>
-							</Group>
-						</Card>
+						<OwnerCard
+							name={ownerProfile.name}
+							description={ownerProfile.description}
+							address={ownerProfile.address}
+							mapLink={ownerProfile.mapLink}
+							website={ownerProfile.website}
+							socialLinks={[]}
+							isDescriptionExpanded={false}
+							onToggleDescription={() => {}}
+						/>
 					)}
 					<EmptyState
 						icon="📅"

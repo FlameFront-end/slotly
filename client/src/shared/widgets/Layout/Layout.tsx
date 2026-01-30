@@ -153,7 +153,7 @@ export const Layout: FC<LayoutProps> = ({ children }) => {
 					header: {
 						backgroundColor: 'var(--bg-secondary)',
 						borderBottom: '1px solid var(--border-color)',
-						padding: '20px 24px'
+						padding: '16px 16px'
 					},
 					title: {
 						fontWeight: 700,
@@ -161,7 +161,7 @@ export const Layout: FC<LayoutProps> = ({ children }) => {
 						color: 'var(--text-primary)'
 					},
 					body: {
-						padding: '24px'
+						padding: '16px'
 					}
 				}}
 			>
@@ -179,7 +179,7 @@ export const Layout: FC<LayoutProps> = ({ children }) => {
 							</div>
 						</Link>
 					))}
-					<Divider my={16} color="var(--border-color)" />
+					<Divider my={12} color="var(--border-color)" />
 					<Button
 						variant="secondary"
 						size="md"

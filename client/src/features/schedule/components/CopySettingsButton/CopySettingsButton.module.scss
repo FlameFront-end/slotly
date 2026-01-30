@@ -1,14 +1,39 @@
 .copyButton {
 	font-size: 12px;
-	padding: 4px 8px;
+	padding: 6px 8px;
 	height: auto;
 	min-height: auto;
+	flex-shrink: 0;
+	display: inline-flex;
+	align-items: center;
+	line-height: 1;
+	
+	@media (max-width: 768px) {
+		font-size: 11px;
+		padding: 5px 6px;
+		
+		:global(.mantine-Button-inner) {
+			gap: 2px;
+		}
+	}
 	
 	:global(.mantine-Button-leftSection) {
 		margin-right: 4px;
+		display: flex;
+		align-items: center;
+		
+		@media (max-width: 768px) {
+			margin-right: 2px;
+		}
 	}
 	
 	:global(.mantine-Button-rightSection) {
 		margin-left: 4px;
+		display: flex;
+		align-items: center;
+		
+		@media (max-width: 768px) {
+			margin-left: 2px;
+		}
 	}
 }

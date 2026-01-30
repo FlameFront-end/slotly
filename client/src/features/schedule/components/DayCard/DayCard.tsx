@@ -1,5 +1,5 @@
-import { type FC } from 'react'
-import { Checkbox, Group } from '@mantine/core'
+import { type FC, useState } from 'react'
+import { Checkbox, Group, NumberInput, Text } from '@mantine/core'
 import { IconClock, IconPlus } from '@tabler/icons-react'
 
 import { type ScheduleDay, type TimeBlock } from '@/shared/api/services/schedule/types'
@@ -22,7 +22,7 @@ interface DayCardProps {
 	onActiveChange: (active: boolean) => void
 	onModeChange: (mode: 'simple' | 'advanced') => void
 	onTimeBlockChange: (blockIndex: number, field: keyof TimeBlock, value: string | number) => void
-	onAddTimeBlock: () => void
+	onAddTimeBlock: (count: number, durationMinutes: number) => void
 	onRemoveTimeBlock: (blockIndex: number) => void
 	onCopySettings: (sourceIndex: number, targetIndex: number) => void
 }
@@ -41,6 +41,22 @@ export const DayCard: FC<DayCardProps> = ({
 	onRemoveTimeBlock,
 	onCopySettings
 }) => {
+	const [batchCount, setBatchCount] = useState(3)
+	const [batchDuration, setBatchDuration] = useState(60)
+
+	const handleBatchChange = (value: string | number): void => {
+		const parsed = typeof value === 'number' ? value : Number(value)
+		const normalized = Number.isFinite(parsed) ? parsed : 2
+		const clamped = Math.max(2, Math.min(12, normalized))
+		setBatchCount(clamped)
+	}
+	const handleDurationChange = (value: string | number): void => {
+		const parsed = typeof value === 'number' ? value : Number(value)
+		const normalized = Number.isFinite(parsed) ? parsed : 60
+		const clamped = Math.max(15, Math.min(480, normalized))
+		setBatchDuration(clamped)
+	}
+
 	return (
 		<div 
 			className={`${s.dayCard} ${day.isActive ? s.dayCardActive : ''} ${isWeekend(day.dayOfWeek) ? s.weekendCard : ''}`}
@@ -55,7 +71,7 @@ export const DayCard: FC<DayCardProps> = ({
 						size="md"
 					/>
 				</Group>
-				<Group gap="xs">
+				<Group gap="xs" align="center">
 					{day.isActive && (
 						<span className={s.activeBadge}>
 							{formatTimeRange(day)}
@@ -89,17 +105,59 @@ export const DayCard: FC<DayCardProps> = ({
 					))}
 					
 					{mode === 'advanced' && (
-						<Button
-							type="button"
-							variant="light"
-							leftSection={<IconPlus size={16} />}
-							onClick={onAddTimeBlock}
-							size="sm"
-							fullWidth
-							className={s.addBlockButton}
-						>
-							Добавить временной блок
-						</Button>
+						<div className={s.blockActions}>
+							<Button
+								type="button"
+								variant="light"
+								leftSection={<IconPlus size={16} />}
+								onClick={() => onAddTimeBlock(1, batchDuration)}
+								size="sm"
+								fullWidth
+								className={s.addBlockButton}
+							>
+								Добавить интервал
+							</Button>
+							<div className={s.batchControls}>
+								<div className={s.batchField}>
+									<Text size="xs" c="dimmed">Сколько</Text>
+									<NumberInput
+										value={batchCount}
+										onChange={handleBatchChange}
+										min={2}
+										max={12}
+										step={1}
+										size="xs"
+										hideControls
+										placeholder="3"
+										className={s.batchInput}
+									/>
+								</div>
+								<div className={s.batchField}>
+									<Text size="xs" c="dimmed">Мин/интервал</Text>
+									<NumberInput
+										value={batchDuration}
+										onChange={handleDurationChange}
+										min={15}
+										max={480}
+										step={5}
+										size="xs"
+										suffix=" мин"
+										hideControls
+										placeholder="60"
+										className={s.batchInput}
+									/>
+								</div>
+								<Button
+									type="button"
+									variant="subtle"
+									onClick={() => onAddTimeBlock(batchCount, batchDuration)}
+									size="sm"
+									fullWidth
+								>
+									Добавить {batchCount} × {batchDuration} мин
+								</Button>
+							</div>
+						</div>
 					)}
 				</div>
 			)}

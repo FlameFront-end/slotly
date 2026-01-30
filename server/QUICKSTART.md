@@ -28,7 +28,8 @@ JWT_REFRESH_TOKEN_EXPIRES_IN=7d
 PORT=3000
 NODE_ENV=development
 
-CORS_ORIGIN=http://localhost:5173
+# CORS настроен на разрешение всех источников в main.ts
+# CORS_ORIGIN=http://localhost:5173
 ```
 
 3. Создайте базу данных:

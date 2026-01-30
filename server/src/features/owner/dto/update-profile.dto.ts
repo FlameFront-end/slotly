@@ -2,8 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsString,
   IsOptional,
-  IsEmail,
-  IsObject,
   ValidateNested,
   IsBoolean,
   IsUrl,
@@ -107,7 +105,7 @@ export class UpdateProfileDto {
 
   @ApiProperty({ required: false })
   @IsOptional()
-  @IsEmail()
+  @IsString()
   contact?: string;
 
   @ApiProperty({ required: false, example: 'Europe/Moscow' })

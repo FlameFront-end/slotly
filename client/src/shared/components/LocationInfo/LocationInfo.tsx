@@ -21,7 +21,7 @@ export const LocationInfo: FC<Props> = ({ address, mapLink, website }) => {
 					<Text size="sm" c="dimmed">{address}</Text>
 				</Group>
 			)}
-			<Group gap="xs" wrap="wrap">
+			<Group gap="xs" wrap="wrap" className={s.linksGroup}>
 				{mapLink && (
 					<Anchor
 						href={mapLink}
@@ -30,7 +30,7 @@ export const LocationInfo: FC<Props> = ({ address, mapLink, website }) => {
 						className={s.mapLink}
 					>
 						<IconExternalLink size={14} stroke={1.5} />
-						<Text size="sm">Открыть на карте</Text>
+						<span>Открыть на карте</span>
 					</Anchor>
 				)}
 				{website && (
@@ -41,7 +41,7 @@ export const LocationInfo: FC<Props> = ({ address, mapLink, website }) => {
 						className={s.websiteLink}
 					>
 						<IconGlobe size={14} stroke={1.5} />
-						<Text size="sm">{formatWebsiteDisplay(website)}</Text>
+						<span>{formatWebsiteDisplay(website)}</span>
 					</Anchor>
 				)}
 			</Group>

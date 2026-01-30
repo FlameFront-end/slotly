@@ -68,5 +68,28 @@ export const formatWebsiteUrl = (url: string): string => {
 }
 
 export const formatWebsiteDisplay = (url: string): string => {
-	return url.replace(/^https?:\/\//, '').replace(/^www\./, '')
+	if (!url) return ''
+	
+	// Удаляем протокол и www
+	let display = url.replace(/^https?:\/\//, '').replace(/^www\./, '')
+	
+	// Если URL очень длинный (больше 40 символов), показываем только домен
+	if (display.length > 40) {
+		try {
+			const urlObj = new URL(url.startsWith('http') ? url : `https://${url}`)
+			const hostname = urlObj.hostname.replace(/^www\./, '')
+			
+			// Если домен сам по себе длинный, обрезаем его
+			if (hostname.length > 30) {
+				return `${hostname.substring(0, 27)}...`
+			}
+			
+			return hostname
+		} catch {
+			// Если не удалось распарсить URL, просто обрезаем
+			return display.length > 40 ? `${display.substring(0, 37)}...` : display
+		}
+	}
+	
+	return display
 }

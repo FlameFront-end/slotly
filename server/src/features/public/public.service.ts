@@ -6,11 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Not, Between } from 'typeorm';
 import { OwnerProfile } from '../owner/entities/owner-profile.entity';
-import {
-  Schedule,
-  ScheduleDay,
-  TimeBlock,
-} from '../schedule/entities/schedule.entity';
+import { Schedule } from '../schedule/entities/schedule.entity';
 import { Booking, BookingStatus } from '../bookings/entities/booking.entity';
 
 @Injectable()
@@ -59,13 +55,13 @@ export class PublicService {
     }
 
     // Определяем диапазон дат
-    const start = startDate ? new Date(startDate) : new Date();
-    start.setHours(0, 0, 0, 0);
-
+    const start = startDate
+      ? this.parseDateOnly(startDate)
+      : this.getTodayUtc();
+    const monthsRange = this.normalizeMonthsRange(schedule.bookingRangeMonths);
     const end = endDate
-      ? new Date(endDate)
-      : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // +30 дней
-    end.setHours(23, 59, 59, 999);
+      ? this.parseDateOnly(endDate)
+      : this.addMonthsUtc(this.getTodayUtc(), monthsRange);
 
     if (start > end) {
       throw new BadRequestException('Неверный формат даты');
@@ -76,8 +72,8 @@ export class PublicService {
       where: {
         ownerId: profile.id,
         date: Between(
-          start.toISOString().split('T')[0],
-          end.toISOString().split('T')[0],
+          this.formatDateOnly(start),
+          this.formatDateOnly(end),
         ) as any,
         status: Not(BookingStatus.CANCELLED),
       },
@@ -94,18 +90,54 @@ export class PublicService {
       slotDuration?: number;
     }> = [];
 
+    const exceptions = Array.isArray(schedule.exceptions)
+      ? (schedule.exceptions as Array<{
+          date: string;
+          isAvailable: boolean;
+          startTime?: string;
+          endTime?: string;
+        }>)
+      : [];
+    const exceptionsMap = new Map(
+      exceptions.map((exception) => [exception.date, exception]),
+    );
+
     // Генерируем слоты для каждого дня в диапазоне
     const currentDate = new Date(start);
     while (currentDate <= end) {
-      const dayOfWeek = currentDate.getDay();
+      const dayOfWeek = currentDate.getUTCDay();
       const activeDay = schedule.days.find(
         (day) => day.dayOfWeek === dayOfWeek && day.isActive,
       );
 
-      if (activeDay) {
-        const dateStr = currentDate.toISOString().split('T')[0];
+      const dateStr = this.formatDateOnly(currentDate);
+      const exception = exceptionsMap.get(dateStr);
+      const slotDuration =
+        activeDay?.timeBlocks?.[0]?.slotDuration ??
+        schedule.days?.[0]?.timeBlocks?.[0]?.slotDuration ??
+        60;
 
-        for (const timeBlock of activeDay.timeBlocks) {
+      // Если есть исключение для этой даты, используем его время
+      const timeBlocks = exception
+        ? exception.startTime && exception.endTime
+          ? [
+              {
+                startTime: exception.startTime,
+                endTime: exception.endTime,
+                slotDuration,
+              },
+            ]
+          : activeDay?.timeBlocks || [
+              {
+                startTime: '09:00',
+                endTime: '18:00',
+                slotDuration,
+              },
+            ]
+        : activeDay?.timeBlocks;
+
+      if (timeBlocks && timeBlocks.length > 0) {
+        for (const timeBlock of timeBlocks) {
           const slots = this.generateTimeSlots(
             timeBlock.startTime,
             timeBlock.endTime,
@@ -125,7 +157,7 @@ export class PublicService {
         }
       }
 
-      currentDate.setDate(currentDate.getDate() + 1);
+      currentDate.setUTCDate(currentDate.getUTCDate() + 1);
     }
 
     return availableSlots;
@@ -156,5 +188,41 @@ export class PublicService {
   private parseTime(timeString: string): number {
     const [hours, minutes] = timeString.split(':').map(Number);
     return hours * 60 + minutes;
+  }
+
+  private formatDateOnly(date: Date): string {
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  private parseDateOnly(dateString: string): Date {
+    const [year, month, day] = dateString.split('-').map(Number);
+    return new Date(Date.UTC(year, month - 1, day));
+  }
+
+  private getTodayUtc(): Date {
+    const now = new Date();
+    return new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
+    );
+  }
+
+  private addDaysUtc(date: Date, days: number): Date {
+    const next = new Date(date);
+    next.setUTCDate(next.getUTCDate() + days);
+    return next;
+  }
+
+  private addMonthsUtc(date: Date, months: number): Date {
+    const next = new Date(date);
+    next.setUTCMonth(next.getUTCMonth() + months);
+    return next;
+  }
+
+  private normalizeMonthsRange(months?: number): number {
+    if (!months || !Number.isFinite(months)) return 2;
+    return Math.min(24, Math.max(1, months));
   }
 }

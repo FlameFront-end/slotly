@@ -21,7 +21,7 @@ export class BookingsService {
     private ownerProfileRepository: Repository<OwnerProfile>,
     @InjectRepository(Schedule)
     private scheduleRepository: Repository<Schedule>,
-  ) {}
+  ) { }
 
   async findAll(
     ownerId: string,

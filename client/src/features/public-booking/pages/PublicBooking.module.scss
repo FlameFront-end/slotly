@@ -1,10 +1,16 @@
 .publicBooking {
   min-height: 100vh;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   background-color: var(--bg-primary);
   padding: 20px;
+  padding-top: 20px;
+  
+  @media (max-width: 768px) {
+    padding: 12px;
+    padding-top: 12px;
+  }
 }
 
 .container {
@@ -336,9 +342,14 @@
   .container {
     max-width: 100%;
     padding: 0;
+    gap: 12px;
   }
 
   .title {
     font-size: 24px;
+  }
+  
+  .ownerCard {
+    padding: 16px;
   }
 }

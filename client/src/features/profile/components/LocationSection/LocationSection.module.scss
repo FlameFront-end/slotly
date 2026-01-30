@@ -51,3 +51,62 @@
 	flex-direction: column;
 	gap: 16px;
 }
+
+.mapLinkContainer {
+	display: flex;
+	flex-direction: column;
+}
+
+.mapLinkDisplay {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.label {
+	font-size: 14px;
+	font-weight: 500;
+	color: var(--text-primary);
+	margin-bottom: 4px;
+}
+
+.mapLinkActions {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.mapLinkButton {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 8px 12px;
+	border-radius: 8px;
+	border: 1px solid var(--border-color);
+	background-color: var(--bg-primary);
+	color: var(--primary);
+	text-decoration: none;
+	font-size: 14px;
+	transition: all 0.2s ease;
+	flex: 1;
+	max-width: fit-content;
+
+	&:hover {
+		border-color: var(--primary);
+		background-color: var(--bg-secondary);
+	}
+
+	span {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		max-width: 200px;
+	}
+}
+
+.editButton {
+	padding: 4px;
+	min-width: auto;
+	width: 28px;
+	height: 28px;
+}

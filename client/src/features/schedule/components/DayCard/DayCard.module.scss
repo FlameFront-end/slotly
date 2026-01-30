@@ -69,16 +69,50 @@
 	margin-bottom: 0;
 	gap: 12px;
 	
+	@media (max-width: 768px) {
+		gap: 8px;
+		align-items: center;
+		flex-wrap: wrap;
+	}
+	
 	:global(.mantine-Checkbox-label) {
 		font-size: 16px;
 		font-weight: 600;
 		color: var(--text-primary);
 		cursor: pointer;
 		transition: color 0.2s ease;
+		
+		@media (max-width: 768px) {
+			font-size: 15px;
+		}
 	}
 	
 	:global(.mantine-Checkbox-input:checked) ~ :global(.mantine-Checkbox-label) {
 		color: var(--primary);
+	}
+	
+	:global(.mantine-Group) {
+		&:first-of-type {
+			flex: 0 1 auto;
+			min-width: 0;
+			align-items: center;
+			
+			@media (max-width: 768px) {
+				flex: 1 1 auto;
+				gap: 6px;
+			}
+		}
+		
+		&:last-of-type {
+			flex-shrink: 0;
+			align-items: center;
+			display: flex;
+			
+			@media (max-width: 768px) {
+				flex: 0 0 auto;
+				gap: 6px;
+			}
+		}
 	}
 }
 
@@ -86,6 +120,11 @@
 	color: var(--text-secondary);
 	transition: all 0.2s ease;
 	flex-shrink: 0;
+	
+	@media (max-width: 768px) {
+		width: 16px;
+		height: 16px;
+	}
 	
 	.dayCardActive & {
 		color: var(--primary);
@@ -107,6 +146,16 @@
 	font-weight: 500;
 	white-space: nowrap;
 	transition: all 0.2s ease;
+	flex-shrink: 0;
+	display: inline-flex;
+	align-items: center;
+	line-height: 1;
+	height: fit-content;
+	
+	@media (max-width: 768px) {
+		padding: 5px 10px;
+		font-size: 12px;
+	}
 	
 	&:hover {
 		background: rgba(77, 171, 247, 0.2);
@@ -131,13 +180,49 @@
 }
 
 .addBlockButton {
-	margin-top: 8px;
+	margin-top: 0;
 	transition: all 0.2s ease;
 	
 	&:hover {
 		transform: translateY(-1px);
 		box-shadow: 0 4px 8px rgba(77, 171, 247, 0.2);
 	}
+}
+
+.blockActions {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.batchControls {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(72px, 1fr));
+	gap: 8px;
+	align-items: stretch;
+
+	:global(.mantine-Button-root) {
+		grid-column: 1 / -1;
+	}
+
+	@media (min-width: 769px) {
+		grid-template-columns: 72px 110px 1fr;
+
+		:global(.mantine-Button-root) {
+			grid-column: auto;
+		}
+	}
+}
+
+.batchField {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.batchInput {
+	max-width: none;
+	width: 100%;
 }
 
 @keyframes fadeInUp {
