@@ -19,18 +19,11 @@ const Profile: FC = () => {
 		formData,
 		setFormData,
 		contactError,
-		contactFieldErrors,
-		setContactFieldErrors,
 		customTimezone,
 		setCustomTimezone,
 		isCustomTimezone,
 		setIsCustomTimezone,
-		handleTelegramBlur,
-		handleEmailBlur,
-		handlePhoneBlur,
-		handleWhatsAppBlur,
 		handleSubmit,
-		formatPhoneNumber,
 		isPending
 	} = useProfileForm()
 
@@ -97,15 +90,8 @@ const Profile: FC = () => {
 
 					<ContactMethodsSection
 						contactMethods={formData.contactMethods}
-						contactFieldErrors={contactFieldErrors}
 						contactError={contactError}
 						onChange={contactMethods => setFormData(prev => ({ ...prev, contactMethods }))}
-						onSetFieldError={(field, error) => setContactFieldErrors(prev => ({ ...prev, [field]: error }))}
-						onTelegramBlur={handleTelegramBlur}
-						onEmailBlur={handleEmailBlur}
-						onPhoneBlur={handlePhoneBlur}
-						onWhatsAppBlur={handleWhatsAppBlur}
-						formatPhoneNumber={formatPhoneNumber}
 					/>
 
 					<LocationSection

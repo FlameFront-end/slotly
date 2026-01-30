@@ -46,7 +46,7 @@ const Dashboard: FC = () => {
 				element: '[data-tour="profile-card"]',
 				popover: {
 					title: 'Профиль',
-					description: 'Настройте информацию о себе и вашей услуге. Укажите контакты, описание, часовой пояс и другие детали.',
+					description: 'Настройте информацию о себе и заведении. Укажите контакты, раздел «О нас», часовой пояс и другие детали.',
 					side: 'top' as const,
 					align: 'start' as const
 				}
@@ -239,7 +239,7 @@ const Dashboard: FC = () => {
 						<div className={s.grid}>
 							<Link to={ROUTES.PROFILE} className={s.card} data-tour="profile-card">
 								<h2>Профиль</h2>
-								<p>Настройте информацию о себе и услуге</p>
+								<p>Настройте информацию о себе и заведении</p>
 							</Link>
 
 							<Link to={ROUTES.SCHEDULE} className={s.card} data-tour="schedule-card">

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { notifications } from '@mantine/notifications'
 import { useOwnerProfile, useUpdateOwnerProfile } from '@/shared/api/services/owner'
-import { getErrorMessage, validateTelegram, validateEmail, validatePhone, formatPhoneNumber } from '@/shared/lib'
+import { getErrorMessage } from '@/shared/lib'
 import { CUSTOM_TIMEZONE_VALUE, TIMEZONES } from '@/shared/model/timezones'
 import type { ContactMethods, SocialLinksConfig, FormData } from '../types'
 
@@ -38,13 +38,6 @@ export const useProfileForm = () => {
 	})
 
 	const [contactError, setContactError] = useState('')
-	const [contactFieldErrors, setContactFieldErrors] = useState({
-		telegram: '',
-		email: '',
-		phone: '',
-		whatsapp: ''
-	})
-
 	const [customTimezone, setCustomTimezone] = useState('')
 	const [isCustomTimezone, setIsCustomTimezone] = useState(false)
 
@@ -110,90 +103,20 @@ export const useProfileForm = () => {
 	}, [profile])
 
 	useEffect(() => {
-		const hasEnabledMethod = Object.values(formData.contactMethods).some(
-			method => method.enabled && method.value.trim()
-		)
+		const hasEnabledMethod = Object.values(formData.contactMethods).some(method => method.enabled)
 
 		if (!hasEnabledMethod) {
-			setContactError('Включите и заполните хотя бы один способ связи для клиентов')
+			setContactError('Включите хотя бы один способ связи, который клиент сможет указать при записи')
 		} else {
 			setContactError('')
 		}
 	}, [formData.contactMethods])
 
-	const handleTelegramBlur = (): void => {
-		if (!formData.contactMethods.telegram.enabled) return
-		const error = validateTelegram(formData.contactMethods.telegram.value)
-		setContactFieldErrors(prev => ({ ...prev, telegram: error }))
-	}
-
-	const handleEmailBlur = (): void => {
-		if (!formData.contactMethods.email.enabled) return
-		const error = validateEmail(formData.contactMethods.email.value)
-		setContactFieldErrors(prev => ({ ...prev, email: error }))
-	}
-
-	const handlePhoneBlur = (): void => {
-		if (!formData.contactMethods.phone.enabled) return
-		const error = validatePhone(formData.contactMethods.phone.value)
-		setContactFieldErrors(prev => ({ ...prev, phone: error }))
-	}
-
-	const handleWhatsAppBlur = (): void => {
-		if (!formData.contactMethods.whatsapp.enabled) return
-		const error = validatePhone(formData.contactMethods.whatsapp.value)
-		setContactFieldErrors(prev => ({ ...prev, whatsapp: error }))
-	}
-
 	const handleSubmit = async (e: React.FormEvent): Promise<void> => {
 		e.preventDefault()
 
-		const hasEnabledMethod = Object.values(formData.contactMethods).some(
-			method => method.enabled && method.value.trim()
-		)
-
-		if (!hasEnabledMethod) {
-			setContactError('Включите и заполните хотя бы один способ связи для клиентов')
-			notifications.show({
-				title: 'Ошибка валидации',
-				message: 'Необходимо включить и заполнить хотя бы один способ связи',
-				color: 'red'
-			})
-			return
-		}
-
-		const hasFieldErrors = Object.entries(formData.contactMethods).some(([key, method]) => {
-			if (!method.enabled) return false
-			const error = contactFieldErrors[key as keyof typeof contactFieldErrors]
-			return !!error
-		})
-
-		if (hasFieldErrors) {
-			notifications.show({
-				title: 'Ошибка валидации',
-				message: 'Проверьте правильность заполнения полей контактов',
-				color: 'red'
-			})
-			return
-		}
-
 		try {
 			const timezoneToSave = isCustomTimezone && customTimezone ? customTimezone : formData.timezone
-
-			const contactMethods: ContactMethods = {
-				telegram: formData.contactMethods.telegram.enabled && formData.contactMethods.telegram.value.trim()
-					? { enabled: true, value: formData.contactMethods.telegram.value.trim() }
-					: { enabled: false, value: '' },
-				email: formData.contactMethods.email.enabled && formData.contactMethods.email.value.trim()
-					? { enabled: true, value: formData.contactMethods.email.value.trim() }
-					: { enabled: false, value: '' },
-				phone: formData.contactMethods.phone.enabled && formData.contactMethods.phone.value.trim()
-					? { enabled: true, value: formData.contactMethods.phone.value.trim() }
-					: { enabled: false, value: '' },
-				whatsapp: formData.contactMethods.whatsapp.enabled && formData.contactMethods.whatsapp.value.trim()
-					? { enabled: true, value: formData.contactMethods.whatsapp.value.trim() }
-					: { enabled: false, value: '' }
-			}
 
 			const socialLinks: SocialLinksConfig = {
 				instagram: formData.socialLinksConfig.instagram.enabled && formData.socialLinksConfig.instagram.value.trim()
@@ -216,14 +139,11 @@ export const useProfileForm = () => {
 					: { enabled: false, value: '' }
 			}
 
-			const firstEnabledContact = Object.values(contactMethods).find(m => m.enabled && m.value)
-			const contactToSave = firstEnabledContact?.value || ''
-
 			const contactMethodsToSave: import('@/shared/api/services/owner/types').ContactMethods = {
-				telegram: contactMethods.telegram.enabled ? { enabled: true, value: contactMethods.telegram.value } : undefined,
-				email: contactMethods.email.enabled ? { enabled: true, value: contactMethods.email.value } : undefined,
-				phone: contactMethods.phone.enabled ? { enabled: true, value: contactMethods.phone.value } : undefined,
-				whatsapp: contactMethods.whatsapp.enabled ? { enabled: true, value: contactMethods.whatsapp.value } : undefined
+				telegram: formData.contactMethods.telegram.enabled ? { enabled: true, value: '' } : undefined,
+				email: formData.contactMethods.email.enabled ? { enabled: true, value: '' } : undefined,
+				phone: formData.contactMethods.phone.enabled ? { enabled: true, value: '' } : undefined,
+				whatsapp: formData.contactMethods.whatsapp.enabled ? { enabled: true, value: '' } : undefined
 			}
 
 			const socialLinksToSave: import('@/shared/api/services/owner/types').SocialLinks = {
@@ -238,7 +158,7 @@ export const useProfileForm = () => {
 			await updateMutation.mutateAsync({
 				name: formData.name,
 				description: formData.description,
-				contact: contactToSave,
+				contact: '',
 				timezone: timezoneToSave,
 				contactMethods: contactMethodsToSave,
 				socialLinks: socialLinksToSave,
@@ -267,18 +187,11 @@ export const useProfileForm = () => {
 		formData,
 		setFormData,
 		contactError,
-		contactFieldErrors,
-		setContactFieldErrors,
 		customTimezone,
 		setCustomTimezone,
 		isCustomTimezone,
 		setIsCustomTimezone,
-		handleTelegramBlur,
-		handleEmailBlur,
-		handlePhoneBlur,
-		handleWhatsAppBlur,
 		handleSubmit,
-		formatPhoneNumber,
 		isPending: updateMutation.isPending
 	}
 }

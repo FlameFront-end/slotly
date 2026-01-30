@@ -24,15 +24,15 @@ export const BasicInfoSection: FC<Props> = ({
 					label="Имя / Название"
 					value={name}
 					onChange={onNameChange}
-					placeholder="Введите имя или название сервиса"
+					placeholder="Введите имя или название заведения"
 					required
 				/>
 
 				<Textarea
-					label="Описание услуги"
+					label="О нас"
 					value={description}
 					onChange={e => onDescriptionChange(e.target.value)}
-					placeholder="Опишите вашу услугу подробно"
+					placeholder="Расскажите о вашем заведении"
 					autosize
 					minRows={4}
 					maxRows={20}

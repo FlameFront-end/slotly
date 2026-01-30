@@ -58,6 +58,9 @@ export class Booking {
   @Index()
   status: BookingStatus;
 
+  @Column({ name: 'read_at', type: 'timestamp', nullable: true })
+  readAt: Date | null = null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

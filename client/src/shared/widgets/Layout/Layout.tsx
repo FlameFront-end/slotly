@@ -6,6 +6,8 @@ import { useDisclosure } from '@mantine/hooks'
 import { IconHome, IconUser, IconCalendar, IconBook, IconLogout } from '@tabler/icons-react'
 
 import { useLogout } from '@/shared/api/services/auth'
+import { useOwnerProfile } from '@/shared/api/services/owner'
+import { useUnreadBookingsCount } from '@/shared/api/services/bookings'
 import { removeAuthData } from '@/shared/lib'
 import { ROUTES } from '@/shared/model/routes'
 import { Button } from '@/shared/kit'
@@ -16,10 +18,18 @@ interface LayoutProps {
 	children: ReactNode
 }
 
+const hasContactMethodsConfigured = (profile: { contactMethods?: Record<string, { enabled?: boolean }> } | null | undefined): boolean => {
+	if (!profile?.contactMethods) return false
+	return Object.values(profile.contactMethods).some(m => m?.enabled)
+}
+
 export const Layout: FC<LayoutProps> = ({ children }) => {
 	const navigate = useNavigate()
 	const location = useLocation()
 	const logoutMutation = useLogout()
+	const { data: profile } = useOwnerProfile()
+	const { data: unreadBookingsCount = 0 } = useUnreadBookingsCount()
+	const needsContactSetup = profile && !hasContactMethodsConfigured(profile)
 	const navRef = useRef<HTMLDivElement>(null)
 	const linkRefs = useRef<(HTMLAnchorElement | null)[]>([])
 	const [opened, { toggle, close }] = useDisclosure(false)
@@ -120,6 +130,10 @@ export const Layout: FC<LayoutProps> = ({ children }) => {
 								onMouseLeave={handleLinkLeave}
 							>
 								<span className={s.navLinkText}>{label}</span>
+								{path === ROUTES.PROFILE && needsContactSetup && <span className={s.navLinkDot} title="Настройте способы связи" />}
+								{path === ROUTES.BOOKINGS && unreadBookingsCount > 0 && (
+									<span className={s.navLinkBadge}>{unreadBookingsCount > 99 ? '99+' : unreadBookingsCount}</span>
+								)}
 							</Link>
 						))}
 					</Group>
@@ -176,6 +190,10 @@ export const Layout: FC<LayoutProps> = ({ children }) => {
 							<div className={s.mobileNavLinkContent}>
 								<Icon className={s.mobileNavIcon} size={20} stroke={1.5} />
 								<span className={s.mobileNavLinkText}>{label}</span>
+								{path === ROUTES.PROFILE && needsContactSetup && <span className={s.mobileNavLinkDot} title="Настройте способы связи" />}
+								{path === ROUTES.BOOKINGS && unreadBookingsCount > 0 && (
+									<span className={s.mobileNavLinkBadge}>{unreadBookingsCount > 99 ? '99+' : unreadBookingsCount}</span>
+								)}
 							</div>
 						</Link>
 					))}

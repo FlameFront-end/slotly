@@ -15,6 +15,15 @@
 		border-color: var(--primary);
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 	}
+
+	&[data-has-error] {
+		border-color: var(--danger);
+		box-shadow: 0 0 0 1px var(--danger);
+
+		.sectionTitle::before {
+			background: var(--danger);
+		}
+	}
 }
 
 .sectionTitle {
@@ -61,11 +70,6 @@
 	}
 }
 
-.contactError {
-	padding: 12px;
-	background-color: var(--danger-light);
-	border: 1px solid var(--danger);
-	border-radius: var(--border-radius);
-	color: var(--danger);
+.contactAlert {
 	font-size: 14px;
 }

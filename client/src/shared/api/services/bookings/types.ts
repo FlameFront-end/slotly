@@ -7,6 +7,7 @@ export interface Booking {
   date: string // YYYY-MM-DD
   time: string // HH:mm
   status: BookingStatus
+  readAt: string | null
   createdAt: string
 }
 

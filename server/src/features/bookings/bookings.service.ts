@@ -5,7 +5,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Not } from 'typeorm';
+import { Repository, Not, IsNull } from 'typeorm';
 import { Booking, BookingStatus } from './entities/booking.entity';
 import { OwnerProfile } from '../owner/entities/owner-profile.entity';
 import { Schedule } from '../schedule/entities/schedule.entity';
@@ -143,6 +143,41 @@ export class BookingsService {
     const booking = await this.findOne(id, ownerId);
     booking.status = BookingStatus.CANCELLED;
     return this.bookingRepository.save(booking);
+  }
+
+  async getUnreadCount(ownerId: string): Promise<number> {
+    const profile = await this.ownerProfileRepository.findOne({
+      where: { userId: ownerId },
+    });
+
+    if (!profile) {
+      return 0;
+    }
+
+    return this.bookingRepository.count({
+      where: {
+        ownerId: profile.id,
+        readAt: IsNull(),
+      },
+    });
+  }
+
+  async markAllAsRead(ownerId: string): Promise<void> {
+    const profile = await this.ownerProfileRepository.findOne({
+      where: { userId: ownerId },
+    });
+
+    if (!profile) {
+      return;
+    }
+
+    await this.bookingRepository.update(
+      {
+        ownerId: profile.id,
+        readAt: IsNull(),
+      },
+      { readAt: new Date() },
+    );
   }
 
   private async validateSlotAvailability(

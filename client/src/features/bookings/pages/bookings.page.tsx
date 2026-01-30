@@ -1,4 +1,4 @@
-import { type FC, useState, useMemo } from 'react'
+import { type FC, useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
 import { notifications } from '@mantine/notifications'
@@ -6,7 +6,7 @@ import { Select, Badge, Group, Text, Button as MantineButton, SegmentedControl }
 import { useMediaQuery } from '@mantine/hooks'
 import { IconCalendar, IconClock, IconUser, IconMail, IconPhone, IconCheck, IconX, IconClockHour4, IconX as IconClose } from '@tabler/icons-react'
 
-import { useBookings, useCancelBooking, useUpdateBookingStatus } from '@/shared/api/services/bookings'
+import { useBookings, useCancelBooking, useUpdateBookingStatus, useMarkBookingsRead } from '@/shared/api/services/bookings'
 import { Loader, EmptyState, ConfirmModal } from '@/shared/kit'
 import { getErrorMessage } from '@/shared/lib'
 import { type BookingStatus } from '@/shared/api/services/bookings/types'
@@ -45,9 +45,14 @@ const Bookings: FC = () => {
 	const { data: bookings, isLoading } = useBookings()
 	const cancelMutation = useCancelBooking()
 	const updateStatusMutation = useUpdateBookingStatus()
+	const markReadMutation = useMarkBookingsRead()
 	const [cancelId, setCancelId] = useState<string | null>(null)
 	const [searchParams, setSearchParams] = useSearchParams()
 	const isMobile = useMediaQuery('(max-width: 768px)')
+
+	useEffect(() => {
+		markReadMutation.mutate()
+	}, [])
 
 	// Получаем фильтры из URL
 	const dateFilter = searchParams.get('date')

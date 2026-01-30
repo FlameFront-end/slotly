@@ -59,37 +59,17 @@ export const usePublicBooking = () => {
 
     const methods: Array<{ type: 'telegram' | 'email' | 'phone' | 'whatsapp', value: string, label: string, icon: ComponentType<{ size?: string | number; stroke?: string | number }> }> = []
 
-    if (ownerProfile.contactMethods.telegram?.enabled && ownerProfile.contactMethods.telegram.value) {
-      methods.push({
-        type: 'telegram',
-        value: ownerProfile.contactMethods.telegram.value,
-        label: 'Telegram',
-        icon: IconBrandTelegram
-      })
+    if (ownerProfile.contactMethods.telegram?.enabled) {
+      methods.push({ type: 'telegram', value: '', label: 'Telegram', icon: IconBrandTelegram })
     }
-    if (ownerProfile.contactMethods.email?.enabled && ownerProfile.contactMethods.email.value) {
-      methods.push({
-        type: 'email',
-        value: ownerProfile.contactMethods.email.value,
-        label: 'Email',
-        icon: IconMail
-      })
+    if (ownerProfile.contactMethods.email?.enabled) {
+      methods.push({ type: 'email', value: '', label: 'Email', icon: IconMail })
     }
-    if (ownerProfile.contactMethods.phone?.enabled && ownerProfile.contactMethods.phone.value) {
-      methods.push({
-        type: 'phone',
-        value: ownerProfile.contactMethods.phone.value,
-        label: 'Телефон',
-        icon: IconPhone
-      })
+    if (ownerProfile.contactMethods.phone?.enabled) {
+      methods.push({ type: 'phone', value: '', label: 'Телефон', icon: IconPhone })
     }
-    if (ownerProfile.contactMethods.whatsapp?.enabled && ownerProfile.contactMethods.whatsapp.value) {
-      methods.push({
-        type: 'whatsapp',
-        value: ownerProfile.contactMethods.whatsapp.value,
-        label: 'WhatsApp',
-        icon: IconBrandWhatsapp
-      })
+    if (ownerProfile.contactMethods.whatsapp?.enabled) {
+      methods.push({ type: 'whatsapp', value: '', label: 'WhatsApp', icon: IconBrandWhatsapp })
     }
 
     return methods

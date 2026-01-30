@@ -5,6 +5,15 @@ import axiosInstance from '@/shared/api/axiosInstance'
 import { type Booking, type CreateBookingPayload, type UpdateBookingStatusPayload } from './types'
 
 export const bookingsApi = {
+  getUnreadCount: async (): Promise<number> => {
+    const response = await axiosInstance.get<{ count: number }>('/bookings/unread-count')
+    return response.data.count
+  },
+
+  markAllAsRead: async (): Promise<void> => {
+    await axiosInstance.post('/bookings/mark-read')
+  },
+
   getBookings: async (): Promise<Booking[]> => {
     const response = await axiosInstance.get<Booking[]>('/bookings')
     return response.data
@@ -35,6 +44,24 @@ export const useBookings = () => {
   return useQuery({
     queryKey: ['bookings'],
     queryFn: () => bookingsApi.getBookings()
+  })
+}
+
+export const useUnreadBookingsCount = () => {
+  return useQuery({
+    queryKey: ['bookings', 'unread-count'],
+    queryFn: () => bookingsApi.getUnreadCount()
+  })
+}
+
+export const useMarkBookingsRead = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: () => bookingsApi.markAllAsRead(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bookings'] }) // также обновит unread-count
+    }
   })
 }
 

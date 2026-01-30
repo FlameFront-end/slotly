@@ -30,6 +30,28 @@ import { BookingStatus } from './entities/booking.entity';
 export class BookingsController {
   constructor(private bookingsService: BookingsService) {}
 
+  @Get('unread-count')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Количество непрочитанных записей' })
+  @ApiResponse({ status: 200, description: 'Число непрочитанных' })
+  @ApiResponse({ status: 401, description: 'Не авторизован' })
+  async getUnreadCount(@CurrentUser() user: any) {
+    const count = await this.bookingsService.getUnreadCount(user.userId);
+    return { count };
+  }
+
+  @Post('mark-read')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Отметить все записи как прочитанные' })
+  @ApiResponse({ status: 200, description: 'Выполнено' })
+  @ApiResponse({ status: 401, description: 'Не авторизован' })
+  async markAllAsRead(@CurrentUser() user: any) {
+    await this.bookingsService.markAllAsRead(user.userId);
+  }
+
   @Get()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
