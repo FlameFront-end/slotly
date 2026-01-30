@@ -7,7 +7,6 @@ import { LocationInfo } from '@/shared/components/LocationInfo'
 import { usePublicBooking } from '../hooks/usePublicBooking'
 import { OwnerCard } from '../components/OwnerCard'
 import { BookingForm } from '../components/BookingForm'
-import { SuccessCard } from '../components/SuccessCard'
 
 import s from './PublicBooking.module.scss'
 
@@ -27,8 +26,6 @@ const PublicBooking: FC = () => {
 		clientContact,
 		setClientContact,
 		contactError,
-		isSuccess,
-		setIsSuccess,
 		isDescriptionExpanded,
 		setIsDescriptionExpanded,
 		availableDates,
@@ -112,16 +109,6 @@ const PublicBooking: FC = () => {
 						title="Способы связи не настроены"
 						description="К сожалению, владелец не настроил способы связи. Свяжитесь с ним напрямую."
 					/>
-				</div>
-			</div>
-		)
-	}
-
-	if (isSuccess) {
-		return (
-			<div className={s.publicBooking}>
-				<div className={s.container}>
-					<SuccessCard onCreateNew={() => setIsSuccess(false)} />
 				</div>
 			</div>
 		)

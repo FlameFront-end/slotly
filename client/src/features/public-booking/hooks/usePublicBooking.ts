@@ -1,22 +1,23 @@
 import { useState, useEffect, useMemo, type ComponentType } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { notifications } from '@mantine/notifications'
 import { IconBrandTelegram, IconMail, IconPhone, IconBrandWhatsapp, IconBrandInstagram, IconBrandVk, IconBrandFacebook, IconBrandYoutube, IconBrandTiktok, IconWorld } from '@tabler/icons-react'
 import dayjs from 'dayjs'
 import { useAvailableSlots } from '@/shared/api/services/schedule'
 import { useCreateBooking } from '@/shared/api/services/bookings'
 import { useOwnerProfileByPublicId } from '@/shared/api/services/owner'
+import { ROUTES } from '@/shared/model/routes'
 import { getErrorMessage, validateTelegram, validateEmail, validatePhone, formatPhoneNumber, formatTelegramValue } from '@/shared/lib'
 
 export const usePublicBooking = () => {
   const { ownerId } = useParams<{ ownerId: string }>()
+  const navigate = useNavigate()
   const [selectedDate, setSelectedDate] = useState('')
   const [selectedTime, setSelectedTime] = useState('')
   const [clientName, setClientName] = useState('')
   const [selectedContactMethod, setSelectedContactMethod] = useState<string>('')
   const [clientContact, setClientContact] = useState('')
   const [contactError, setContactError] = useState('')
-  const [isSuccess, setIsSuccess] = useState(false)
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false)
 
   const startDate = dayjs().format('YYYY-MM-DD')
@@ -173,7 +174,7 @@ export const usePublicBooking = () => {
     }
 
     try {
-      await createBookingMutation.mutateAsync({
+      const booking = await createBookingMutation.mutateAsync({
         clientName,
         clientContact,
         date: selectedDate,
@@ -183,16 +184,10 @@ export const usePublicBooking = () => {
 
       notifications.show({
         title: 'Успешно',
-        message: 'Запись успешно создана!',
+        message: 'Запись создана. Сохраните ссылку — по ней вы всегда сможете посмотреть детали.',
         color: 'green'
       })
-      setIsSuccess(true)
-      setClientName('')
-      setClientContact('')
-      setContactError('')
-      setSelectedContactMethod('')
-      setSelectedDate('')
-      setSelectedTime('')
+      navigate(ROUTES.PUBLIC_BOOKING_CONFIRMATION.replace(':bookingId', booking.id))
     } catch (error: unknown) {
       const message = getErrorMessage(error)
       notifications.show({
@@ -233,8 +228,6 @@ export const usePublicBooking = () => {
     clientContact,
     setClientContact: handleContactChange,
     contactError,
-    isSuccess,
-    setIsSuccess,
     isDescriptionExpanded,
     setIsDescriptionExpanded,
     availableDates,

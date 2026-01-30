@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import axiosInstance from '@/shared/api/axiosInstance'
 
-import { type Booking, type CreateBookingPayload, type UpdateBookingStatusPayload } from './types'
+import { type Booking, type CreateBookingPayload, type UpdateBookingStatusPayload, type PublicBookingResponse } from './types'
 
 export const bookingsApi = {
   getUnreadCount: async (): Promise<number> => {
@@ -21,6 +21,11 @@ export const bookingsApi = {
 
   getBooking: async (id: string): Promise<Booking> => {
     const response = await axiosInstance.get<Booking>(`/bookings/${id}`)
+    return response.data
+  },
+
+  getPublicBooking: async (bookingId: string): Promise<PublicBookingResponse> => {
+    const response = await axiosInstance.get<PublicBookingResponse>(`/public/booking/${bookingId}`)
     return response.data
   },
 
@@ -70,6 +75,14 @@ export const useBooking = (id: string) => {
     queryKey: ['bookings', id],
     queryFn: () => bookingsApi.getBooking(id),
     enabled: !!id
+  })
+}
+
+export const usePublicBooking = (bookingId: string) => {
+  return useQuery({
+    queryKey: ['public', 'booking', bookingId],
+    queryFn: () => bookingsApi.getPublicBooking(bookingId),
+    enabled: !!bookingId
   })
 }
 

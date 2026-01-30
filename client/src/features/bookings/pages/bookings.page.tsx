@@ -1,4 +1,4 @@
-import { type FC, useState, useMemo, useEffect } from 'react'
+import { type FC, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
 import { notifications } from '@mantine/notifications'
@@ -6,8 +6,8 @@ import { Select, Badge, Group, Text, Button as MantineButton, SegmentedControl }
 import { useMediaQuery } from '@mantine/hooks'
 import { IconCalendar, IconClock, IconUser, IconMail, IconPhone, IconCheck, IconX, IconClockHour4, IconX as IconClose } from '@tabler/icons-react'
 
-import { useBookings, useCancelBooking, useUpdateBookingStatus, useMarkBookingsRead } from '@/shared/api/services/bookings'
-import { Loader, EmptyState, ConfirmModal } from '@/shared/kit'
+import { useBookings, useUpdateBookingStatus, useMarkBookingsRead } from '@/shared/api/services/bookings'
+import { Loader, EmptyState } from '@/shared/kit'
 import { getErrorMessage } from '@/shared/lib'
 import { type BookingStatus } from '@/shared/api/services/bookings/types'
 import { Layout } from '@/shared/widgets'
@@ -18,6 +18,7 @@ const STATUS_LABELS: Record<BookingStatus, string> = {
 	pending: 'Ожидает',
 	confirmed: 'Подтверждена',
 	cancelled: 'Отменена',
+	rejected: 'Отклонена',
 	completed: 'Завершена'
 }
 
@@ -25,6 +26,7 @@ const STATUS_COLORS: Record<BookingStatus, string> = {
 	pending: 'yellow',
 	confirmed: 'blue',
 	cancelled: 'red',
+	rejected: 'red',
 	completed: 'green'
 }
 
@@ -32,21 +34,22 @@ const STATUS_ICONS: Record<BookingStatus, typeof IconClock> = {
 	pending: IconClockHour4,
 	confirmed: IconCheck,
 	cancelled: IconX,
+	rejected: IconX,
 	completed: IconCheck
 }
 
+// Владелец может только подтвердить, отклонить или завершить. Отмена — только со стороны клиента.
 const STATUS_OPTIONS: Array<{ value: BookingStatus; label: string }> = [
 	{ value: 'pending', label: 'Ожидает' },
 	{ value: 'confirmed', label: 'Подтверждена' },
+	{ value: 'rejected', label: 'Отклонено' },
 	{ value: 'completed', label: 'Завершена' }
 ]
 
 const Bookings: FC = () => {
 	const { data: bookings, isLoading } = useBookings()
-	const cancelMutation = useCancelBooking()
 	const updateStatusMutation = useUpdateBookingStatus()
 	const markReadMutation = useMarkBookingsRead()
-	const [cancelId, setCancelId] = useState<string | null>(null)
 	const [searchParams, setSearchParams] = useSearchParams()
 	const isMobile = useMediaQuery('(max-width: 768px)')
 
@@ -67,11 +70,11 @@ const Bookings: FC = () => {
 		// Фильтр по дате
 		if (dateFilter === 'today') {
 			const today = new Date().toISOString().split('T')[0]
-			filtered = filtered.filter(b => b.date === today && b.status !== 'cancelled')
+			filtered = filtered.filter(b => b.date === today && b.status !== 'cancelled' && b.status !== 'rejected')
 		} else if (dateFilter === 'upcoming') {
 			const today = new Date().toISOString().split('T')[0]
 			filtered = filtered.filter(
-				b => b.date >= today && b.status !== 'cancelled' && b.status !== 'completed'
+				b => b.date >= today && b.status !== 'cancelled' && b.status !== 'rejected' && b.status !== 'completed'
 			)
 		}
 
@@ -181,31 +184,6 @@ const Bookings: FC = () => {
 		return contact.includes('@')
 	}
 
-	const handleCancelClick = (id: string): void => {
-		setCancelId(id)
-	}
-
-	const handleCancelConfirm = async (): Promise<void> => {
-		if (!cancelId) return
-
-		try {
-			await cancelMutation.mutateAsync(cancelId)
-			notifications.show({
-				title: 'Успешно',
-				message: 'Запись отменена',
-				color: 'green'
-			})
-			setCancelId(null)
-		} catch (error: unknown) {
-			const message = getErrorMessage(error)
-			notifications.show({
-				title: 'Ошибка',
-				message,
-				color: 'red'
-			})
-		}
-	}
-
 	if (isLoading) {
 		return (
 			<Layout>
@@ -293,6 +271,7 @@ const Bookings: FC = () => {
 												{ label: 'Ожидает', value: 'pending' },
 												{ label: 'Подтверждена', value: 'confirmed' },
 												{ label: 'Завершена', value: 'completed' },
+												{ label: 'Отклонена', value: 'rejected' },
 												{ label: 'Отменена', value: 'cancelled' }
 											]}
 											className={s.mobileSelect}
@@ -307,6 +286,7 @@ const Bookings: FC = () => {
 											{ label: 'Ожидает', value: 'pending' },
 											{ label: 'Подтверждена', value: 'confirmed' },
 											{ label: 'Завершена', value: 'completed' },
+											{ label: 'Отклонена', value: 'rejected' },
 											{ label: 'Отменена', value: 'cancelled' }
 										]}
 										className={s.statusFilter}
@@ -406,6 +386,7 @@ const Bookings: FC = () => {
 											{ label: 'Ожидает', value: 'pending' },
 											{ label: 'Подтверждена', value: 'confirmed' },
 											{ label: 'Завершена', value: 'completed' },
+											{ label: 'Отклонена', value: 'rejected' },
 											{ label: 'Отменена', value: 'cancelled' }
 										]}
 										className={s.mobileSelect}
@@ -420,6 +401,7 @@ const Bookings: FC = () => {
 										{ label: 'Ожидает', value: 'pending' },
 										{ label: 'Подтверждена', value: 'confirmed' },
 										{ label: 'Завершена', value: 'completed' },
+										{ label: 'Отклонена', value: 'rejected' },
 										{ label: 'Отменена', value: 'cancelled' }
 									]}
 									className={s.statusFilter}
@@ -458,9 +440,9 @@ const Bookings: FC = () => {
 							<div className={s.dateBookings}>
 								{items.map(booking => {
 									const StatusIcon = STATUS_ICONS[booking.status]
-									const isCancelled = booking.status === 'cancelled'
+									const isInactive = booking.status === 'cancelled' || booking.status === 'rejected'
 									return (
-										<div key={booking.id} className={`${s.card} ${isCancelled ? s.cancelled : ''}`}>
+										<div key={booking.id} className={`${s.card} ${isInactive ? s.cancelled : ''}`}>
 											<div className={s.cardHeader}>
 												<div className={s.clientInfo}>
 													<Group gap="xs" align="center" mb={4}>
@@ -478,41 +460,38 @@ const Bookings: FC = () => {
 														</Text>
 													</Group>
 												</div>
-												{booking.status !== 'cancelled' && (
+												{/* Отмену ставит только клиент — селект скрыт только для отменённых. Для «Отклонено» владелец может изменить статус. */}
+											{booking.status !== 'cancelled' && (
 													<Select
 														value={booking.status}
 														onChange={(value) => {
 															if (value && value !== booking.status) {
-																if (value === 'cancelled') {
-																	handleCancelClick(booking.id)
-																} else {
-																	updateStatusMutation.mutate(
-																		{ id: booking.id, status: value as BookingStatus },
-																		{
-																			onSuccess: () => {
-																				notifications.show({
-																					title: 'Успешно',
-																					message: 'Статус обновлен',
-																					color: 'green'
-																				})
-																			},
-																			onError: (error: unknown) => {
-																				const message = getErrorMessage(error)
-																				notifications.show({
-																					title: 'Ошибка',
-																					message,
-																					color: 'red'
-																				})
-																			}
+																updateStatusMutation.mutate(
+																	{ id: booking.id, status: value as BookingStatus },
+																	{
+																		onSuccess: () => {
+																			notifications.show({
+																				title: 'Успешно',
+																				message: 'Статус обновлен',
+																				color: 'green'
+																			})
+																		},
+																		onError: (error: unknown) => {
+																			const message = getErrorMessage(error)
+																			notifications.show({
+																				title: 'Ошибка',
+																				message,
+																				color: 'red'
+																			})
 																		}
-																	)
-																}
+																	}
+																)
 															}
 														}}
 														data={STATUS_OPTIONS}
 														size="sm"
 														className={s.statusSelect}
-														disabled={updateStatusMutation.isPending || cancelMutation.isPending}
+														disabled={updateStatusMutation.isPending}
 													/>
 												)}
 											</div>
@@ -551,17 +530,6 @@ const Bookings: FC = () => {
 					))}
 				</div>
 
-			<ConfirmModal
-				opened={cancelId !== null}
-				onClose={() => setCancelId(null)}
-				onConfirm={handleCancelConfirm}
-				title="Отмена записи"
-				message="Вы уверены, что хотите отменить эту запись? Это действие нельзя отменить."
-				confirmLabel="Отменить запись"
-				cancelLabel="Нет, оставить"
-				confirmColor="red"
-				loading={cancelMutation.isPending}
-			/>
 		</div>
 		</Layout>
 	)

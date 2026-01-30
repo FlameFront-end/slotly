@@ -41,6 +41,10 @@ export const router = createBrowserRouter([
 			{
 				path: ROUTES.PUBLIC_BOOKING,
 				lazy: () => import('../../features/public-booking/pages/public-booking.page')
+			},
+			{
+				path: ROUTES.PUBLIC_BOOKING_CONFIRMATION,
+				lazy: () => import('../../features/public-booking/pages/booking-confirmation.page')
 			}
 		]
 	}

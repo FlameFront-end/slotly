@@ -119,9 +119,9 @@ const Dashboard: FC = () => {
 		if (!bookings) return null
 
 		const today = new Date().toISOString().split('T')[0]
-		const todayBookings = bookings.filter(b => b.date === today && b.status !== 'cancelled')
+		const todayBookings = bookings.filter(b => b.date === today && b.status !== 'cancelled' && b.status !== 'rejected')
 		const upcomingBookings = bookings.filter(
-			b => b.date >= today && b.status !== 'cancelled' && b.status !== 'completed'
+			b => b.date >= today && b.status !== 'cancelled' && b.status !== 'rejected' && b.status !== 'completed'
 		)
 		const pendingBookings = bookings.filter(b => b.status === 'pending')
 

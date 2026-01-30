@@ -36,4 +36,12 @@ export class PublicController {
   ) {
     return this.publicService.getAvailableSlots(ownerId, startDate, endDate);
   }
+
+  @Get('booking/:id')
+  @ApiOperation({ summary: 'Получить данные записи для клиента (постоянная ссылка)' })
+  @ApiResponse({ status: 200, description: 'Данные записи и владельца' })
+  @ApiResponse({ status: 404, description: 'Запись не найдена' })
+  async getBookingForClient(@Param('id') id: string) {
+    return this.publicService.getBookingForClient(id);
+  }
 }

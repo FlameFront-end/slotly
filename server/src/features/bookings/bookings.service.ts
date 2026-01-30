@@ -5,7 +5,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Not, IsNull } from 'typeorm';
+import { Repository, Not, In, IsNull } from 'typeorm';
 import { Booking, BookingStatus } from './entities/booking.entity';
 import { OwnerProfile } from '../owner/entities/owner-profile.entity';
 import { Schedule } from '../schedule/entities/schedule.entity';
@@ -185,13 +185,13 @@ export class BookingsService {
     date: string,
     time: string,
   ): Promise<void> {
-    // Проверяем, есть ли активное бронирование на этот слот
+    // Проверяем, есть ли активное бронирование на этот слот (отменённые и отклонённые освобождают слот)
     const existingBooking = await this.bookingRepository.findOne({
       where: {
         ownerId,
         date,
         time,
-        status: Not(BookingStatus.CANCELLED),
+        status: Not(In([BookingStatus.CANCELLED, BookingStatus.REJECTED])),
       },
     });
 

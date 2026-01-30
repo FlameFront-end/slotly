@@ -4,7 +4,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Not, Between } from 'typeorm';
+import { Repository, Not, In, Between } from 'typeorm';
 import { OwnerProfile } from '../owner/entities/owner-profile.entity';
 import { Schedule } from '../schedule/entities/schedule.entity';
 import { Booking, BookingStatus } from '../bookings/entities/booking.entity';
@@ -31,6 +31,50 @@ export class PublicService {
     }
 
     return profile;
+  }
+
+  async getBookingForClient(bookingId: string): Promise<{
+    id: string;
+    date: string;
+    time: string;
+    status: string;
+    clientName: string;
+    clientContact: string;
+    owner: {
+      publicId: string;
+      name: string;
+      description: string | null;
+      address: string | null;
+      mapLink: string | null;
+      website: string | null;
+    };
+  }> {
+    const booking = await this.bookingRepository.findOne({
+      where: { id: bookingId },
+      relations: ['ownerProfile'],
+    });
+
+    if (!booking) {
+      throw new NotFoundException('Запись не найдена');
+    }
+
+    const owner = booking.ownerProfile;
+    return {
+      id: booking.id,
+      date: booking.date,
+      time: booking.time,
+      status: booking.status,
+      clientName: booking.clientName,
+      clientContact: booking.clientContact,
+      owner: {
+        publicId: owner.publicId,
+        name: owner.name,
+        description: owner.description ?? null,
+        address: owner.address ?? null,
+        mapLink: owner.mapLink ?? null,
+        website: owner.website ?? null,
+      },
+    };
   }
 
   async getAvailableSlots(
@@ -75,7 +119,7 @@ export class PublicService {
           this.formatDateOnly(start),
           this.formatDateOnly(end),
         ) as any,
-        status: Not(BookingStatus.CANCELLED),
+        status: Not(In([BookingStatus.CANCELLED, BookingStatus.REJECTED])),
       },
     });
 

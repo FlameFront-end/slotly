@@ -7,7 +7,8 @@ export const ROUTES = {
 	SCHEDULE: '/schedule',
 	BOOKINGS: '/bookings',
 
-	PUBLIC_BOOKING: '/public/booking/:ownerId'
+	PUBLIC_BOOKING: '/public/booking/:ownerId',
+	PUBLIC_BOOKING_CONFIRMATION: '/public/booking-confirmation/:bookingId'
 } as const
 
 export const buildRoute = (route: string, params: Record<string, string>): string => {

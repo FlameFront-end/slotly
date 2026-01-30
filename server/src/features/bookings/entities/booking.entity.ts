@@ -14,12 +14,13 @@ export enum BookingStatus {
   PENDING = 'pending',
   CONFIRMED = 'confirmed',
   CANCELLED = 'cancelled',
+  REJECTED = 'rejected',
   COMPLETED = 'completed',
 }
 
 @Entity('bookings')
 @Index(['ownerId', 'date', 'time'], {
-  where: `status != 'cancelled'`,
+  where: `status NOT IN ('cancelled', 'rejected')`,
   unique: true,
 })
 export class Booking {

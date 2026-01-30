@@ -1,0 +1,208 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-primary);
+  padding: 24px;
+
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
+}
+
+.container {
+  width: 100%;
+  max-width: 440px;
+  animation: fadeInUp 0.35s ease-out;
+}
+
+.card {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.header {
+  padding: 28px 24px 20px;
+  text-align: center;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.successIcon {
+  color: var(--success);
+  animation: scaleIn 0.4s ease-out;
+}
+
+.title {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.hint {
+  display: block;
+  max-width: 320px;
+  margin: 0 auto 16px;
+  line-height: 1.5;
+}
+
+.statusBadge {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: none;
+}
+
+.body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 20px;
+}
+
+.details {
+  margin: 0;
+  padding: 16px 18px;
+  background-color: var(--bg-tertiary);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.detailRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+
+  dt {
+    flex-shrink: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  dd {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.4;
+    color: var(--text-primary);
+  }
+}
+
+.detailIcon {
+  color: var(--primary);
+}
+
+.ownerName {
+  font-weight: 600;
+}
+
+.locationSection {
+  width: 100%;
+  padding-top: 4px;
+}
+
+.descriptionBlock {
+  padding: 14px 16px;
+  background-color: var(--bg-tertiary);
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+}
+
+.description {
+  margin: 0;
+  line-height: 1.55;
+  display: block;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.addToCalendarBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 15px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+
+  &:hover {
+    background-color: rgba(77, 171, 247, 0.12);
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.newBookingLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  border-radius: 10px;
+  background-color: var(--primary);
+  color: white;
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+  transition: opacity 0.2s, transform 0.15s;
+
+  &:hover {
+    opacity: 0.92;
+    color: white;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
