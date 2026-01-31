@@ -10,7 +10,8 @@ import { useOwnerProfile } from '@/shared/api/services/owner'
 import { ROUTES } from '@/shared/model/routes'
 import { CopyButton } from '@/shared/kit'
 import { useOnboardingTour } from '@/shared/hooks/useOnboardingTour'
-import { Layout, Loader } from '@/shared/widgets'
+import { Layout } from '@/shared/widgets'
+import { DashboardSkeleton } from '@/shared/kit'
 
 import s from './Dashboard.module.scss'
 
@@ -139,7 +140,7 @@ const Dashboard: FC = () => {
         <h1 className={s.title}>Панель управления</h1>
 
         {isLoading ? (
-          <Loader message="Загрузка статистики..." />
+          <DashboardSkeleton />
         ) : (
           <>
             {profile?.publicId && (

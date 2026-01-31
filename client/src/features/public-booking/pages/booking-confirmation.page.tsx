@@ -6,7 +6,7 @@ import { IconCheck, IconCalendar, IconClock, IconUser, IconBuilding, IconCalenda
 import dayjs from 'dayjs'
 import 'dayjs/locale/ru'
 
-import { Loader, EmptyState, Button, ConfirmModal } from '@/shared/kit'
+import { BookingConfirmationSkeleton, EmptyState, Button, ConfirmModal } from '@/shared/kit'
 import { LocationInfo } from '@/shared/components/LocationInfo'
 import { usePublicBooking, useCancelPublicBooking } from '@/shared/api/services/bookings'
 import { ROUTES } from '@/shared/model/routes'
@@ -44,7 +44,7 @@ const BookingConfirmation: FC = () => {
 		return (
 			<div className={s.page}>
 				<div className={s.container}>
-					<Loader message="Загрузка..." size="lg" />
+					<BookingConfirmationSkeleton />
 				</div>
 			</div>
 		)

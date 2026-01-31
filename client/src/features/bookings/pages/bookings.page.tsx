@@ -7,7 +7,7 @@ import { useMediaQuery } from '@mantine/hooks'
 import { IconCalendar, IconClock, IconUser, IconMail, IconPhone, IconCheck, IconX, IconClockHour4, IconX as IconClose } from '@tabler/icons-react'
 
 import { useBookings, useUpdateBookingStatus, useMarkBookingsRead } from '@/shared/api/services/bookings'
-import { Loader, EmptyState } from '@/shared/kit'
+import { BookingsSkeleton, EmptyState, Skeleton } from '@/shared/kit'
 import { getErrorMessage } from '@/shared/lib'
 import { type BookingStatus } from '@/shared/api/services/bookings/types'
 import { Layout } from '@/shared/widgets'
@@ -188,8 +188,11 @@ const Bookings: FC = () => {
 		return (
 			<Layout>
 				<div className={s.bookings}>
-					<h1 className={s.title}>Записи</h1>
-					<Loader message="Загрузка записей..." />
+					<div className={s.header}>
+						<h1 className={s.title}>Записи</h1>
+						<Skeleton height={28} width={80} borderRadius={6} />
+					</div>
+					<BookingsSkeleton />
 				</div>
 			</Layout>
 		)

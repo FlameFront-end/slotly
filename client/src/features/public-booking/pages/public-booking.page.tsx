@@ -1,7 +1,7 @@
 import { type FC } from 'react'
 import { Text } from '@mantine/core'
 
-import { Loader, EmptyState } from '@/shared/kit'
+import { PublicBookingSkeleton, EmptyState } from '@/shared/kit'
 import { usePublicBooking } from '../hooks/usePublicBooking'
 import { OwnerCard } from '../components/OwnerCard'
 import { BookingForm } from '../components/BookingForm'
@@ -40,7 +40,7 @@ const PublicBooking: FC = () => {
 		return (
 			<div className={s.publicBooking}>
 				<div className={s.container}>
-					<Loader message="Загрузка..." size="lg" />
+					<PublicBookingSkeleton />
 				</div>
 			</div>
 		)

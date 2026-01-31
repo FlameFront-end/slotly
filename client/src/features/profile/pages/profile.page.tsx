@@ -1,7 +1,7 @@
 import { type FC } from 'react'
 import { notifications } from '@mantine/notifications'
 
-import { Button, Loader } from '@/shared/kit'
+import { Button, ProfileSkeleton } from '@/shared/kit'
 import { Layout } from '@/shared/widgets'
 import { useProfileForm } from '../hooks/useProfileForm'
 import { BasicInfoSection } from '../components/BasicInfoSection'
@@ -66,7 +66,7 @@ const Profile: FC = () => {
 						<h1 className={s.title}>Профиль</h1>
 						<p className={s.subtitle}>Управление настройками вашего профиля</p>
 					</div>
-					<Loader message="Загрузка профиля..." />
+					<ProfileSkeleton />
 				</div>
 			</Layout>
 		)

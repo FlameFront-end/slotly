@@ -224,6 +224,16 @@ body::-webkit-scrollbar {
   background-color: rgba(0, 0, 0, 0.7) !important;
 }
 
+.react-loading-skeleton {
+  --pseudo-element-display: block !important;
+  opacity: 0.8;
+}
+
+.react-loading-skeleton::after {
+  animation-duration: 1.5s !important;
+  animation-timing-function: ease-in-out !important;
+}
+
 .driver-highlighted-element {
   border-radius: 12px !important;
 }

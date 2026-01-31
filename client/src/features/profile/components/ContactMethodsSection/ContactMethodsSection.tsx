@@ -19,7 +19,7 @@ export const ContactMethodsSection: FC<Props> = ({
 		<section className={s.section} data-has-error={contactError ? '' : undefined}>
 			<h2 className={s.sectionTitle}>Какие контакты принимать от клиентов при записи</h2>
 			<div className={s.sectionContent}>
-				<Text size="sm" c="dimmed" mb="md">
+				<Text size="sm" c="dimmed" mb="md" className={s.sectionHint}>
 					Включите способы связи, которые клиент сможет указать при записи. Свои контакты указывать не нужно — клиент введёт свой Telegram, email или телефон.
 				</Text>
 

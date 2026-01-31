@@ -3,7 +3,7 @@ import { Text, Select } from '@mantine/core'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ru'
 
-import { Button, Loader } from '@/shared/kit'
+import { Button, ScheduleSkeleton } from '@/shared/kit'
 import { Layout } from '@/shared/widgets'
 import { useScheduleForm } from '../hooks/useScheduleForm'
 import { isWeekday, isWeekend } from '../utils/schedule.utils'
@@ -77,7 +77,7 @@ const Schedule: FC = () => {
 							</div>
 						</div>
 					</div>
-					<Loader message="Загрузка расписания..." />
+					<ScheduleSkeleton />
 				</div>
 			</Layout>
 		)
