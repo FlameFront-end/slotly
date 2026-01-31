@@ -6,7 +6,7 @@ import { useSchedule, useUpdateSchedule } from '@/shared/api/services/schedule'
 import { getErrorMessage } from '@/shared/lib'
 import { type ScheduleDay, type ScheduleException, type TimeBlock } from '@/shared/api/services/schedule/types'
 import { type Service } from '@/shared/api/services/services/types'
-import { parseTimeToMinutes, formatMinutesToTime, calculateEndTime } from '@/shared/utils/time.utils'
+import { calculateEndTime } from '@/shared/utils/time.utils'
 import { migrateScheduleDay, DAYS_OF_WEEK, createDefaultSchedule } from '../utils/schedule.utils'
 
 const DEFAULT_START_TIME = '09:00'
@@ -139,20 +139,31 @@ export const useScheduleForm = (services: Service[] = []) => {
 					const newTimeBlocks = [...day.timeBlocks]
 					const currentBlock = { ...newTimeBlocks[blockIndex] }
 					
-					// Обновляем изменённое поле
-					currentBlock[field] = value
+					// Обновляем изменённое поле с правильной типизацией
+					let updatedBlock: TimeBlock
+					if (field === 'startTime') {
+						updatedBlock = { ...currentBlock, startTime: value as string }
+					} else if (field === 'endTime') {
+						updatedBlock = { ...currentBlock, endTime: value as string }
+					} else if (field === 'slotDuration') {
+						updatedBlock = { ...currentBlock, slotDuration: value as number }
+					} else if (field === 'serviceId') {
+						updatedBlock = { ...currentBlock, serviceId: value as string | null | undefined }
+					} else {
+						updatedBlock = currentBlock
+					}
 					
 					// Автоматически пересчитываем endTime при изменении startTime, serviceId или slotDuration
 					const shouldRecalculateEndTime = field === 'startTime' || field === 'serviceId' || field === 'slotDuration'
 					if (shouldRecalculateEndTime) {
-						const startTime = field === 'startTime' ? (value as string) : currentBlock.startTime
-						const serviceId = field === 'serviceId' ? (value as string | null) : currentBlock.serviceId
-						const slotDuration = field === 'slotDuration' ? (value as number) : currentBlock.slotDuration
+						const startTime = field === 'startTime' ? (value as string) : updatedBlock.startTime
+						const serviceId = field === 'serviceId' ? (value as string | null) : updatedBlock.serviceId
+						const slotDuration = field === 'slotDuration' ? (value as number) : updatedBlock.slotDuration
 						
-						currentBlock.endTime = calculateEndTimeForBlock(startTime, serviceId, slotDuration)
+						updatedBlock.endTime = calculateEndTimeForBlock(startTime, serviceId, slotDuration)
 					}
 					
-					newTimeBlocks[blockIndex] = currentBlock
+					newTimeBlocks[blockIndex] = updatedBlock
 					return { ...day, timeBlocks: newTimeBlocks }
 				}
 				return day

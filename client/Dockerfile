@@ -7,7 +7,7 @@ WORKDIR /app
 ENV VITE_API_URL=/api
 
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
 COPY . .
 RUN npm run build

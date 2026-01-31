@@ -55,12 +55,12 @@ export const ServiceForm: FC<Props> = ({ service, onSuccess, onCancel }) => {
 				await updateServiceMutation.mutateAsync({
 					id: service.id,
 					...values,
-					price: values.price ?? null
+					price: values.price ?? undefined
 				})
 			} else {
 				await createServiceMutation.mutateAsync({
 					...values,
-					price: values.price ?? null
+					price: values.price ?? undefined
 				})
 			}
 			onSuccess()

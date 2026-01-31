@@ -3,6 +3,7 @@ import { Card, Stack, Group, Text, Select, Radio, Divider, ActionIcon } from '@m
 import { IconCalendar, IconClock, IconUser, IconCheck, IconChevronLeft, IconChevronRight, IconBriefcase } from '@tabler/icons-react'
 import { Button, Input } from '@/shared/kit'
 import { createServiceSelectOptions } from '@/shared/utils/service.utils'
+import { type Service } from '@/shared/api/services/services/types'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ru'
 import s from './BookingForm.module.scss'
@@ -19,14 +20,6 @@ interface ContactMethod {
 interface TimeOption {
   value: string
   label: string
-}
-
-interface Service {
-  id: string
-  name: string
-  description: string | null
-  duration: number
-  price: number | null
 }
 
 interface Props {

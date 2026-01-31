@@ -1,6 +1,6 @@
 import { type FC, useState, useEffect, useRef } from 'react'
 import { Container, Title, Text, Group, Stack, Card, ThemeIcon, Grid, Box, Badge, ActionIcon } from '@mantine/core'
-import { IconCalendar, IconClock, IconUsers, IconCheck, IconArrowRight, IconShield, IconDeviceMobile, IconChartBar, IconSparkles, IconRocket, IconTrendingUp, IconChevronLeft, IconChevronRight, IconBolt, IconHandshake, IconHeart } from '@tabler/icons-react'
+import { IconCalendar, IconClock, IconUsers, IconCheck, IconArrowRight, IconShield, IconDeviceMobile, IconChartBar, IconSparkles, IconRocket, IconTrendingUp, IconChevronLeft, IconChevronRight } from '@tabler/icons-react'
 import { useNavigate } from 'react-router-dom'
 
 import { Button } from '@/shared/kit'
