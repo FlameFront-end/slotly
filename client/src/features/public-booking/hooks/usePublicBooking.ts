@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, type ComponentType } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { notifications } from '@mantine/notifications'
 import { IconBrandTelegram, IconMail, IconPhone, IconBrandWhatsapp, IconBrandInstagram, IconBrandVk, IconBrandFacebook, IconBrandYoutube, IconBrandTiktok, IconWorld } from '@tabler/icons-react'
 import dayjs from 'dayjs'
@@ -9,9 +10,12 @@ import { useOwnerProfileByPublicId } from '@/shared/api/services/owner'
 import { ROUTES } from '@/shared/model/routes'
 import { getErrorMessage, validateTelegram, validateEmail, validatePhone, formatPhoneNumber, formatTelegramValue } from '@/shared/lib'
 
+const SLOT_TAKEN_MESSAGE = 'Слот уже занят'
+
 export const usePublicBooking = () => {
   const { ownerId } = useParams<{ ownerId: string }>()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const [selectedDate, setSelectedDate] = useState('')
   const [selectedTime, setSelectedTime] = useState('')
   const [clientName, setClientName] = useState('')
@@ -190,6 +194,12 @@ export const usePublicBooking = () => {
       navigate(ROUTES.PUBLIC_BOOKING_CONFIRMATION.replace(':bookingId', booking.id))
     } catch (error: unknown) {
       const message = getErrorMessage(error)
+      if (message === SLOT_TAKEN_MESSAGE && ownerId) {
+        setSelectedTime('')
+        await queryClient.invalidateQueries({
+          queryKey: ['schedule', 'slots', ownerId]
+        })
+      }
       notifications.show({
         title: 'Ошибка',
         message,

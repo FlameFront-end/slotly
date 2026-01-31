@@ -2,7 +2,6 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
-  ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Not, In, IsNull } from 'typeorm';
@@ -21,7 +20,7 @@ export class BookingsService {
     private ownerProfileRepository: Repository<OwnerProfile>,
     @InjectRepository(Schedule)
     private scheduleRepository: Repository<Schedule>,
-  ) { }
+  ) {}
 
   async findAll(
     ownerId: string,
@@ -180,22 +179,27 @@ export class BookingsService {
     );
   }
 
+  private normalizeTime(t: string): string {
+    return t && t.length >= 5 ? String(t).slice(0, 5) : t;
+  }
+
   private async validateSlotAvailability(
     ownerId: string,
     date: string,
     time: string,
   ): Promise<void> {
-    // Проверяем, есть ли активное бронирование на этот слот (отменённые и отклонённые освобождают слот)
-    const existingBooking = await this.bookingRepository.findOne({
+    const timeNorm = this.normalizeTime(time);
+    const existingBookings = await this.bookingRepository.find({
       where: {
         ownerId,
         date,
-        time,
         status: Not(In([BookingStatus.CANCELLED, BookingStatus.REJECTED])),
       },
     });
-
-    if (existingBooking) {
+    const slotTaken = existingBookings.some(
+      (b) => this.normalizeTime(String(b.time)) === timeNorm,
+    );
+    if (slotTaken) {
       throw new BadRequestException('Слот уже занят');
     }
 

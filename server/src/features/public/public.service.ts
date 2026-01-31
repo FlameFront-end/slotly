@@ -77,6 +77,31 @@ export class PublicService {
     };
   }
 
+  async cancelByClient(bookingId: string): Promise<{
+    id: string;
+    status: string;
+  }> {
+    const booking = await this.bookingRepository.findOne({
+      where: { id: bookingId },
+    });
+
+    if (!booking) {
+      throw new NotFoundException('Запись не найдена');
+    }
+
+    if (
+      booking.status === BookingStatus.CANCELLED ||
+      booking.status === BookingStatus.REJECTED
+    ) {
+      throw new BadRequestException('Запись уже отменена или отклонена');
+    }
+
+    booking.status = BookingStatus.CANCELLED;
+    await this.bookingRepository.save(booking);
+
+    return { id: booking.id, status: booking.status };
+  }
+
   async getAvailableSlots(
     ownerPublicId: string,
     startDate?: string,
@@ -111,7 +136,6 @@ export class PublicService {
       throw new BadRequestException('Неверный формат даты');
     }
 
-    // Получаем все активные бронирования в диапазоне
     const bookings = await this.bookingRepository.find({
       where: {
         ownerId: profile.id,
@@ -123,9 +147,13 @@ export class PublicService {
       },
     });
 
+    const normalizeTime = (t: string): string =>
+      t && t.length >= 5 ? t.slice(0, 5) : t;
+
     const bookedSlots = new Set<string>();
     bookings.forEach((booking) => {
-      bookedSlots.add(`${booking.date}_${booking.time}`);
+      const timeNorm = normalizeTime(String(booking.time));
+      bookedSlots.add(`${booking.date}_${timeNorm}`);
     });
 
     const availableSlots: Array<{

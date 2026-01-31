@@ -25,6 +25,12 @@
   overflow: hidden;
 }
 
+.cardInactive {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.2), 0 4px 24px rgba(0, 0, 0, 0.08);
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(255, 107, 107, 0.06) 100%);
+}
+
 .header {
   padding: 28px 24px 20px;
   text-align: center;
@@ -40,6 +46,11 @@
 
 .successIcon {
   color: var(--success);
+  animation: scaleIn 0.4s ease-out;
+}
+
+.inactiveIcon {
+  color: var(--danger);
   animation: scaleIn 0.4s ease-out;
 }
 

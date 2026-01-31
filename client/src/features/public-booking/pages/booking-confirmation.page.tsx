@@ -1,13 +1,14 @@
-import { type FC } from 'react'
+import { type FC, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { notifications } from '@mantine/notifications'
 import { Card, Text, Badge } from '@mantine/core'
-import { IconCheck, IconCalendar, IconClock, IconUser, IconBuilding, IconCalendarPlus } from '@tabler/icons-react'
+import { IconCheck, IconCalendar, IconClock, IconUser, IconBuilding, IconCalendarPlus, IconX } from '@tabler/icons-react'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ru'
 
-import { Loader, EmptyState } from '@/shared/kit'
+import { Loader, EmptyState, Button, ConfirmModal } from '@/shared/kit'
 import { LocationInfo } from '@/shared/components/LocationInfo'
-import { usePublicBooking } from '@/shared/api/services/bookings'
+import { usePublicBooking, useCancelPublicBooking } from '@/shared/api/services/bookings'
 import { ROUTES } from '@/shared/model/routes'
 import { downloadIcsFile } from '@/shared/lib/calendar'
 
@@ -31,9 +32,13 @@ const STATUS_COLORS: Record<string, string> = {
 	completed: 'blue'
 }
 
+const CAN_CANCEL_STATUSES = ['pending', 'confirmed'] as const
+
 const BookingConfirmation: FC = () => {
 	const { bookingId } = useParams<{ bookingId: string }>()
+	const [cancelModalOpened, setCancelModalOpened] = useState(false)
 	const { data: booking, isLoading, isError } = usePublicBooking(bookingId || '')
+	const cancelMutation = useCancelPublicBooking(bookingId || '')
 
 	if (isLoading) {
 		return (
@@ -61,14 +66,40 @@ const BookingConfirmation: FC = () => {
 
 	const formattedDate = dayjs(booking.date).format('D MMMM YYYY, dddd')
 	const formattedTime = booking.time.slice(0, 5)
+	const canCancel = CAN_CANCEL_STATUSES.includes(booking.status as (typeof CAN_CANCEL_STATUSES)[number])
+	const isInactive = booking.status === 'cancelled' || booking.status === 'rejected'
+
+	const handleCancelClick = () => setCancelModalOpened(true)
+
+	const handleCancelConfirm = async () => {
+		try {
+			await cancelMutation.mutateAsync()
+			setCancelModalOpened(false)
+			notifications.show({
+				title: 'Готово',
+				message: 'Запись отменена',
+				color: 'green'
+			})
+		} catch {
+			notifications.show({
+				title: 'Ошибка',
+				message: 'Не удалось отменить запись',
+				color: 'red'
+			})
+		}
+	}
 
 	return (
 		<div className={s.page}>
 			<div className={s.container}>
-				<Card className={s.card} padding={0} radius="lg" withBorder shadow="sm">
+				<Card className={`${s.card} ${isInactive ? s.cardInactive : ''}`} padding={0} radius="lg" withBorder shadow="sm">
 					<div className={s.header}>
 						<div className={s.iconWrapper}>
-							<IconCheck size={40} stroke={2} className={s.successIcon} />
+							{isInactive ? (
+								<IconX size={40} stroke={2} className={s.inactiveIcon} />
+							) : (
+								<IconCheck size={40} stroke={2} className={s.successIcon} />
+							)}
 						</div>
 						<Text fw={700} size="xl" ta="center" className={s.title}>Ваша запись</Text>
 						<Text size="sm" c="dimmed" ta="center" className={s.hint}>
@@ -123,6 +154,18 @@ const BookingConfirmation: FC = () => {
 						)}
 
 						<div className={s.actions}>
+							{canCancel && (
+								<Button
+									variant="outline"
+									color="red"
+									fullWidth
+									leftSection={<IconX size={18} stroke={1.5} />}
+									onClick={handleCancelClick}
+									loading={cancelMutation.isPending}
+								>
+									Отменить запись
+								</Button>
+							)}
 							<button
 								type="button"
 								onClick={() => {
@@ -154,6 +197,17 @@ const BookingConfirmation: FC = () => {
 						</div>
 					</div>
 				</Card>
+
+				<ConfirmModal
+					opened={cancelModalOpened}
+					onClose={() => !cancelMutation.isPending && setCancelModalOpened(false)}
+					onConfirm={handleCancelConfirm}
+					title="Отменить запись?"
+					message="Вы уверены, что хотите отменить запись? Это действие нельзя отменить."
+					confirmLabel="Да, отменить"
+					confirmColor="red"
+					loading={cancelMutation.isPending}
+				/>
 			</div>
 		</div>
 	)

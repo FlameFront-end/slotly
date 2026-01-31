@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Post,
   Param,
   Query,
   HttpCode,
@@ -43,5 +44,15 @@ export class PublicController {
   @ApiResponse({ status: 404, description: 'Запись не найдена' })
   async getBookingForClient(@Param('id') id: string) {
     return this.publicService.getBookingForClient(id);
+  }
+
+  @Post('booking/:id/cancel')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Отменить бронирование (для клиента по ссылке)' })
+  @ApiResponse({ status: 200, description: 'Бронирование отменено' })
+  @ApiResponse({ status: 400, description: 'Запись уже отменена' })
+  @ApiResponse({ status: 404, description: 'Запись не найдена' })
+  async cancelByClient(@Param('id') id: string) {
+    return this.publicService.cancelByClient(id);
   }
 }

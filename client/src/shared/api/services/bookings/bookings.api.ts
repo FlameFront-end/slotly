@@ -29,6 +29,13 @@ export const bookingsApi = {
     return response.data
   },
 
+  cancelPublicBooking: async (bookingId: string): Promise<{ id: string; status: string }> => {
+    const response = await axiosInstance.post<{ id: string; status: string }>(
+      `/public/booking/${bookingId}/cancel`
+    )
+    return response.data
+  },
+
   createBooking: async (payload: CreateBookingPayload): Promise<Booking> => {
     const response = await axiosInstance.post<Booking>('/bookings', payload)
     return response.data
@@ -83,6 +90,19 @@ export const usePublicBooking = (bookingId: string) => {
     queryKey: ['public', 'booking', bookingId],
     queryFn: () => bookingsApi.getPublicBooking(bookingId),
     enabled: !!bookingId
+  })
+}
+
+export const useCancelPublicBooking = (bookingId: string) => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: () => bookingsApi.cancelPublicBooking(bookingId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['public', 'booking', bookingId] })
+      queryClient.invalidateQueries({ queryKey: ['bookings'] })
+      queryClient.invalidateQueries({ queryKey: ['schedule', 'slots'] })
+    }
   })
 }
 
