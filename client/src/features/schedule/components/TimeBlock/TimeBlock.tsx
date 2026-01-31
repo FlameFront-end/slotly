@@ -43,7 +43,7 @@ export const TimeBlock: FC<TimeBlockProps> = ({
 			)}
 			<div className={s.timeBlockFields}>
 				<TextInput
-					label="Начало приема"
+					label="Начало приёма"
 					type="time"
 					value={block.startTime}
 					onChange={e => onChange('startTime', e.target.value)}
@@ -51,7 +51,7 @@ export const TimeBlock: FC<TimeBlockProps> = ({
 				/>
 
 				<TextInput
-					label="Конец приема"
+					label="Конец приёма"
 					type="time"
 					value={block.endTime}
 					onChange={e => onChange('endTime', e.target.value)}

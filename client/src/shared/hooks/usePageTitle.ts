@@ -16,7 +16,7 @@ const TITLE_MAP: Record<string, string> = {
 
 const getPageTitle = (pathname: string): string => {
 	if (pathname.startsWith('/public/booking/')) {
-		return 'Запись на прием'
+		return 'Запись на приём'
 	}
 
 	const exactMatch = TITLE_MAP[pathname]

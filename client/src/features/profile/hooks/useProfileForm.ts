@@ -168,7 +168,7 @@ export const useProfileForm = () => {
 			})
 			notifications.show({
 				title: 'Успешно',
-				message: 'Профиль обновлен',
+				message: 'Профиль обновлён',
 				color: 'green'
 			})
 		} catch (error: unknown) {

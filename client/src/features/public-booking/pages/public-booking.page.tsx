@@ -130,7 +130,7 @@ const PublicBooking: FC = () => {
 					/>
 				)}
 
-				<Text fw={600} size="xl" className={s.title}>Запись на прием</Text>
+				<Text fw={600} size="xl" className={s.title}>Запись на приём</Text>
 
 				<BookingForm
 					selectedDate={selectedDate}

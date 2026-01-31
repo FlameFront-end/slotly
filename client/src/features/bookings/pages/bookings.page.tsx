@@ -42,7 +42,7 @@ const STATUS_ICONS: Record<BookingStatus, typeof IconClock> = {
 const STATUS_OPTIONS: Array<{ value: BookingStatus; label: string }> = [
 	{ value: 'pending', label: 'Ожидает' },
 	{ value: 'confirmed', label: 'Подтверждена' },
-	{ value: 'rejected', label: 'Отклонено' },
+	{ value: 'rejected', label: 'Отклонена' },
 	{ value: 'completed', label: 'Завершена' }
 ]
 
@@ -472,7 +472,7 @@ const Bookings: FC = () => {
 																		onSuccess: () => {
 																			notifications.show({
 																				title: 'Успешно',
-																				message: 'Статус обновлен',
+																				message: 'Статус обновлён',
 																				color: 'green'
 																			})
 																		},

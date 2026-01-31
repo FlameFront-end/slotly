@@ -26,7 +26,7 @@ export const ContactMethodsSection: FC<Props> = ({
 				{contactError && (
 					<Alert
 						icon={<IconAlertCircle size={20} />}
-						title="Важно"
+						title="Обратите внимание"
 						color="red"
 						variant="light"
 						className={s.contactAlert}

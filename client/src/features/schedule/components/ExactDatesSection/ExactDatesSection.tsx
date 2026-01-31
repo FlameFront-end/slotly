@@ -65,7 +65,7 @@ export const ExactDatesSection: FC<ExactDatesSectionProps> = ({
 					<IconChevronDown size={18} className={s.chevron} />
 				)}
 				<Text size="sm" fw={600} c="dimmed">
-					Точные даты приема
+					Точные даты приёма
 				</Text>
 				{exceptions.length > 0 && (
 					<Text size="xs" c="dimmed" className={s.badge}>
@@ -84,13 +84,13 @@ export const ExactDatesSection: FC<ExactDatesSectionProps> = ({
 						size="sm"
 					/>
 					<Text size="xs" c="dimmed" mt={10} style={{ lineHeight: 1.4 }}>
-						Выберите даты, когда запись доступна вне расписания по дням недели.
+						Выберите даты, когда запись доступна вне обычного расписания по дням недели.
 					</Text>
 				</div>
 				<div className={s.list}>
 					{sortedExceptions.length === 0 ? (
 						<Text size="sm" c="dimmed" className={s.listEmpty}>
-							Нет выбранных дат. Выберите даты в календаре слева.
+							Нет выбранных дат. Выберите даты в календаре.
 						</Text>
 					) : (
 						sortedExceptions.map(item => (

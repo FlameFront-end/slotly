@@ -18,7 +18,7 @@ export const getErrorMessage = (error: unknown, customMessages?: Record<string, 
 		}
 
 		if (error.response?.status === 403) {
-			return 'Доступ запрещен'
+			return 'Доступ запрещён'
 		}
 
 		if (error.response?.status === 404) {
@@ -26,15 +26,23 @@ export const getErrorMessage = (error: unknown, customMessages?: Record<string, 
 		}
 
 		if (error.response?.status === 500) {
-			return 'Ошибка сервера'
+			return 'Ошибка сервера. Попробуйте позже.'
 		}
 
-		return error.message || 'Произошла ошибка'
+		if (error.code === 'ERR_NETWORK' || error.message?.toLowerCase().includes('network')) {
+			return 'Проверьте подключение к интернету'
+		}
+
+		return error.message || 'Что-то пошло не так. Попробуйте ещё раз.'
 	}
 
 	if (error instanceof Error) {
-		return error.message
+		const msg = error.message?.toLowerCase()
+		if (msg?.includes('network') || msg === 'failed to fetch') {
+			return 'Проверьте подключение к интернету'
+		}
+		return error.message || 'Что-то пошло не так. Попробуйте ещё раз.'
 	}
 
-	return 'Произошла неизвестная ошибка'
+	return 'Что-то пошло не так. Попробуйте ещё раз.'
 }

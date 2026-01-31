@@ -25,7 +25,7 @@ export const ModeSelector: FC<ModeSelectorProps> = ({ mode, onChange }) => {
 			<Text size="xs" c="dimmed" mt="xs">
 				{mode === 'simple'
 					? 'Клиент сможет записаться на любое время внутри этого диапазона'
-					: 'Добавьте отдельные интервалы приема в течение дня'}
+					: 'Добавьте отдельные интервалы приёма в течение дня'}
 			</Text>
 		</div>
 	)

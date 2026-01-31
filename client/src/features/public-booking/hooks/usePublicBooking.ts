@@ -171,7 +171,7 @@ export const usePublicBooking = () => {
     if (!ownerId) {
       notifications.show({
         title: 'Ошибка',
-        message: 'Не указан владелец. Откройте страницу бронирования по ссылке.',
+        message: 'Ошибка загрузки. Откройте страницу по ссылке из сообщения или письма.',
         color: 'red'
       })
       return

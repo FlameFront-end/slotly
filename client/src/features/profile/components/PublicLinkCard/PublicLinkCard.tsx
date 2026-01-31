@@ -17,7 +17,7 @@ export const PublicLinkCard: FC<Props> = ({ publicLink, onCopy }) => {
 						Публичная ссылка для записи
 					</Text>
 					<Text size="xs" c="dimmed" mb="md">
-						Поделитесь этой ссылкой с клиентами для записи на прием
+						Поделитесь этой ссылкой с клиентами для записи на приём
 					</Text>
 				</div>
 				<Group gap="sm" align="stretch">

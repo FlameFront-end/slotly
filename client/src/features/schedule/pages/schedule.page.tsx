@@ -48,7 +48,7 @@ const Schedule: FC = () => {
 					<div className={s.header}>
 						<div className={s.headerTop}>
 							<h1 className={s.title}>Расписание</h1>
-							<p className={s.subtitle}>Настройте время приема и доступность для записи</p>
+							<p className={s.subtitle}>Настройте время приёма и доступность для записи</p>
 						</div>
 						<div className={s.headerSettings}>
 							<Text size="xs" c="dimmed" className={s.periodLabel}>Доступна запись на</Text>
@@ -89,7 +89,7 @@ const Schedule: FC = () => {
 				<div className={s.header}>
 					<div className={s.headerTop}>
 						<h1 className={s.title}>Расписание</h1>
-						<p className={s.subtitle}>Настройте время приема и доступность для записи</p>
+						<p className={s.subtitle}>Настройте время приёма и доступность для записи</p>
 					</div>
 					<div className={s.headerSettings}>
 						<Text size="xs" c="dimmed" className={s.periodLabel}>Доступна запись на</Text>

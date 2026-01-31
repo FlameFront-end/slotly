@@ -8,7 +8,7 @@ const ErrorPage = () => {
 	return (
 		<div style={{ padding: '40px', textAlign: 'center' }}>
 			<h1>Ошибка</h1>
-			<p>{error?.message || 'Произошла неизвестная ошибка'}</p>
+			<p>{error?.message || 'Что-то пошло не так. Попробуйте ещё раз.'}</p>
 			<Button onClick={() => window.location.href = '/'}>
 				Вернуться на главную
 			</Button>

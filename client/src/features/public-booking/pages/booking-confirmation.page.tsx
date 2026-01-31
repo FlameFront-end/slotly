@@ -203,7 +203,7 @@ const BookingConfirmation: FC = () => {
 					onClose={() => !cancelMutation.isPending && setCancelModalOpened(false)}
 					onConfirm={handleCancelConfirm}
 					title="Отменить запись?"
-					message="Вы уверены, что хотите отменить запись? Это действие нельзя отменить."
+					message="Вы уверены, что хотите отменить запись? После отмены слот снова станет свободным для других клиентов."
 					confirmLabel="Да, отменить"
 					confirmColor="red"
 					loading={cancelMutation.isPending}
