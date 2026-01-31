@@ -1,4 +1,9 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
+import { IconAlertTriangle } from '@tabler/icons-react'
+
+import { Button } from '@/shared/kit'
+
+import s from '@/shared/styles/error-fallback.module.scss'
 
 interface Props {
 	children: ReactNode
@@ -7,6 +12,28 @@ interface Props {
 interface State {
 	hasError: boolean
 	error?: Error
+}
+
+const CHUNK_LOAD_MESSAGES = [
+	'Failed to fetch dynamically imported module',
+	'Importing a module script failed',
+	'Loading chunk',
+	'ChunkLoadError',
+]
+
+function isChunkLoadError(error: Error): boolean {
+	return CHUNK_LOAD_MESSAGES.some((msg) => error.message.includes(msg))
+}
+
+function getFriendlyTitle(error: Error): string {
+	return isChunkLoadError(error) ? 'Не удалось загрузить страницу' : 'Произошла ошибка'
+}
+
+function getFriendlyDescription(error: Error): string {
+	if (isChunkLoadError(error)) {
+		return 'Вероятно, обновилась версия приложения или возникли проблемы с сетью. Обновите страницу — после этого всё должно заработать.'
+	}
+	return 'Что-то пошло не так. Попробуйте обновить страницу или вернуться на главную.'
 }
 
 export class ErrorBoundary extends Component<Props, State> {
@@ -24,12 +51,32 @@ export class ErrorBoundary extends Component<Props, State> {
 	}
 
 	render(): ReactNode {
-		if (this.state.hasError) {
+		if (this.state.hasError && this.state.error) {
+			const error = this.state.error
+			const showDetail = !isChunkLoadError(error)
+
 			return (
-				<div style={{ padding: '20px', textAlign: 'center' }}>
-					<h1>Что-то пошло не так</h1>
-					<p>{this.state.error?.message}</p>
-					<button onClick={() => window.location.reload()}>Перезагрузить страницу</button>
+				<div className={s.wrap}>
+					<div className={s.card}>
+						<div className={s.icon}>
+							<IconAlertTriangle stroke={1.75} />
+						</div>
+						<h1 className={s.title}>{getFriendlyTitle(error)}</h1>
+						<p className={s.description}>{getFriendlyDescription(error)}</p>
+						{showDetail && <pre className={s.detail}>{error.message}</pre>}
+						<div className={s.actions}>
+							<Button className={s.button} onClick={() => window.location.reload()}>
+								Обновить страницу
+							</Button>
+							<Button
+								className={s.button}
+								variant="secondary"
+								onClick={() => (window.location.href = '/')}
+							>
+								На главную
+							</Button>
+						</div>
+					</div>
 				</div>
 			)
 		}

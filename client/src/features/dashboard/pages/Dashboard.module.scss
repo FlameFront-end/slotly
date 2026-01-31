@@ -1,293 +1,293 @@
 .dashboard {
-	max-width: 1200px;
-	margin: 0 auto;
-	padding: 40px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
 
-	@media (max-width: 768px) {
-		padding: 16px 12px;
-	}
+  @media (max-width: 768px) {
+    padding: 16px 12px;
+  }
 }
 
 .title {
-	font-size: 32px;
-	font-weight: 600;
-	margin-bottom: 40px;
-	color: var(--text-primary);
+  font-size: 32px;
+  font-weight: 600;
+  margin-bottom: 40px;
+  color: var(--text-primary);
 
-	@media (max-width: 768px) {
-		font-size: 24px;
-		margin-bottom: 24px;
-	}
+  @media (max-width: 768px) {
+    font-size: 24px;
+    margin-bottom: 24px;
+  }
 }
 
 
 .publicLink {
-	flex: 1;
-	padding: 12px 16px;
-	background-color: var(--bg-tertiary);
-	border-radius: var(--border-radius);
-	font-size: 14px;
-	color: var(--primary);
-	word-break: break-all;
-	display: flex;
-	align-items: center;
-	min-height: 42px;
-	font-family: 'Courier New', monospace;
-	border: 1px solid var(--border-color);
-	transition: all 0.2s ease;
-	cursor: pointer;
-	user-select: none;
-	overflow-wrap: anywhere;
-	line-height: 1.5;
+  flex: 1;
+  padding: 12px 16px;
+  background-color: var(--bg-tertiary);
+  border-radius: var(--border-radius);
+  font-size: 14px;
+  color: var(--primary);
+  word-break: break-all;
+  display: flex;
+  align-items: center;
+  min-height: 42px;
+  font-family: 'Courier New', monospace;
+  border: 1px solid var(--border-color);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  user-select: none;
+  overflow-wrap: anywhere;
+  line-height: 1.5;
 
-	@media (max-width: 768px) {
-		padding: 10px 12px;
-		font-size: 12px;
-		min-height: auto;
-		height: auto;
-		word-break: break-all;
-		overflow-wrap: break-word;
-		line-height: 1.5;
-	}
+  @media (max-width: 768px) {
+    padding: 10px 12px;
+    font-size: 12px;
+    min-height: auto;
+    height: auto;
+    word-break: break-all;
+    overflow-wrap: break-word;
+    line-height: 1.5;
+  }
 
-	&:hover {
-		border-color: var(--primary);
-		background-color: var(--bg-secondary);
-	}
+  &:hover {
+    border-color: var(--primary);
+    background-color: var(--bg-secondary);
+  }
 
-	&:active {
-		transform: scale(0.98);
-		background-color: var(--bg-primary);
-	}
+  &:active {
+    transform: scale(0.98);
+    background-color: var(--bg-primary);
+  }
 
-	&:focus {
-		outline: 2px solid var(--primary);
-		outline-offset: 2px;
-	}
+  &:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
 }
 
 .publicLinkCard {
-	margin-bottom: 32px;
-	background: linear-gradient(135deg, rgba(77, 171, 247, 0.1) 0%, rgba(77, 171, 247, 0.05) 100%);
-	border-color: var(--primary);
+  margin-bottom: 32px;
+  background: linear-gradient(135deg, rgba(77, 171, 247, 0.1) 0%, rgba(77, 171, 247, 0.05) 100%);
+  border-color: var(--primary);
 
-	// Убеждаемся, что кнопка имеет такую же высоту, как инпут
-	:global(.mantine-Group-root) {
-		align-items: stretch;
+  // Убеждаемся, что кнопка имеет такую же высоту, как инпут
+  :global(.mantine-Group-root) {
+    align-items: stretch;
 
-		@media (max-width: 768px) {
-			flex-direction: column;
-			align-items: stretch;
-			gap: 10px !important;
-		}
-	}
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px !important;
+    }
+  }
 
-	:global(button) {
-		height: 42px;
-		min-height: 42px;
+  :global(button) {
+    height: 42px;
+    min-height: 42px;
 
-		@media (max-width: 768px) {
-			width: 100%;
-			height: 40px;
-			min-height: 40px;
-		}
-	}
+    @media (max-width: 768px) {
+      width: 100%;
+      height: 40px;
+      min-height: 40px;
+    }
+  }
 
-	:global(.mantine-Stack-root) {
-		@media (max-width: 768px) {
-			gap: 12px !important;
-		}
-	}
+  :global(.mantine-Stack-root) {
+    @media (max-width: 768px) {
+      gap: 12px !important;
+    }
+  }
 
-	@media (max-width: 768px) {
-		margin-bottom: 16px;
-		padding: 12px !important;
-	}
+  @media (max-width: 768px) {
+    margin-bottom: 16px;
+    padding: 12px !important;
+  }
 }
 
 .stats {
-	display: grid;
-	grid-template-columns: repeat(4, 1fr);
-	gap: 20px;
-	margin-bottom: 40px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 40px;
 
-	@media (max-width: 1024px) {
-		grid-template-columns: repeat(2, 1fr);
-	}
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
 
-	@media (max-width: 768px) {
-		grid-template-columns: repeat(2, 1fr);
-		gap: 12px;
-		margin-bottom: 24px;
-	}
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
 }
 
 .statCardLink {
-	text-decoration: none;
-	color: inherit;
-	display: block;
-	height: 100%;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  height: 100%;
 }
 
 .statCard {
-	height: 100%;
-	transition: all 0.2s ease;
-	cursor: pointer;
-	min-height: 100px;
-	display: flex;
-	flex-direction: column;
+  height: 100%;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
 
-	&:hover {
-		transform: translateY(-4px);
-		box-shadow: var(--shadow-md);
-		border-color: var(--primary);
-	}
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary);
+  }
 
-	&:active {
-		transform: translateY(-2px);
-	}
+  &:active {
+    transform: translateY(-2px);
+  }
 }
 
 .grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-	gap: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
 
-	@media (max-width: 768px) {
-		grid-template-columns: 1fr;
-		gap: 12px;
-	}
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
 }
 
 .card {
-	display: block;
-	padding: 32px;
-	border: 1px solid var(--border-color);
-	border-radius: var(--border-radius);
-	background-color: var(--bg-secondary);
-	text-decoration: none;
-	color: inherit;
-	transition: all 0.2s;
-	box-shadow: var(--shadow-sm);
+  display: block;
+  padding: 32px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background-color: var(--bg-secondary);
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s;
+  box-shadow: var(--shadow-sm);
 
-	@media (max-width: 768px) {
-		padding: 16px;
-	}
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
 
-	&:hover {
-		box-shadow: var(--shadow-md);
-		transform: translateY(-2px);
-		background-color: var(--bg-tertiary);
-	}
+  &:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+    background-color: var(--bg-tertiary);
+  }
 
-	h2 {
-		font-size: 20px;
-		font-weight: 600;
-		margin-bottom: 8px;
-		color: var(--text-primary);
+  h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-primary);
 
-		@media (max-width: 768px) {
-			font-size: 18px;
-			margin-bottom: 6px;
-		}
-	}
+    @media (max-width: 768px) {
+      font-size: 18px;
+      margin-bottom: 6px;
+    }
+  }
 
-	p {
-		font-size: 14px;
-		color: var(--text-secondary);
+  p {
+    font-size: 14px;
+    color: var(--text-secondary);
 
-		@media (max-width: 768px) {
-			font-size: 13px;
-		}
-	}
+    @media (max-width: 768px) {
+      font-size: 13px;
+    }
+  }
 }
 
 .trialModal {
-	:global(.mantine-Modal-body) {
-		padding: 0;
-	}
-	
-	:global(.mantine-Modal-header) {
-		display: none;
-	}
+  :global(.mantine-Modal-body) {
+    padding: 0;
+  }
+
+  :global(.mantine-Modal-header) {
+    display: none;
+  }
 }
 
 .trialModalContent {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	padding: 40px 32px;
-	gap: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 32px;
+  gap: 24px;
 }
 
 .trialIcon {
-	width: 64px;
-	height: 64px;
-	border-radius: 50%;
-	background-color: var(--primary);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	color: white;
-	flex-shrink: 0;
-	box-shadow: 0 4px 12px rgba(77, 171, 247, 0.3);
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(77, 171, 247, 0.3);
 }
 
 .trialText {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 12px;
-	text-align: center;
-	width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  width: 100%;
 }
 
 .trialTitle {
-	font-size: 24px;
-	font-weight: 700;
-	color: var(--text-primary);
-	margin: 0;
-	line-height: 1.3;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.3;
 }
 
 .trialMessage {
-	font-size: 16px;
-	font-weight: 500;
-	color: var(--text-primary);
-	margin: 0;
-	line-height: 1.5;
-	
-	strong {
-		color: var(--primary);
-		font-weight: 600;
-	}
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.5;
+
+  strong {
+    color: var(--primary);
+    font-weight: 600;
+  }
 }
 
 .trialDescription {
-	font-size: 14px;
-	color: var(--text-secondary);
-	margin: 0;
-	line-height: 1.6;
-	max-width: 400px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+  max-width: 400px;
 }
 
 .trialButtons {
-	display: flex;
-	flex-direction: column;
-	gap: 12px;
-	width: 100%;
-	margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  margin-top: 8px;
 }
 
 .trialButton {
-	margin-top: 0;
+  margin-top: 0;
 }
 
 .trialSkipButton {
-	color: var(--text-secondary);
-	
-	&:hover {
-		background-color: var(--bg-tertiary);
-		color: var(--text-primary);
-	}
+  color: var(--text-secondary);
+
+  &:hover {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+  }
 }
