@@ -18,9 +18,9 @@ interface LayoutProps {
 	children: ReactNode
 }
 
-const hasContactMethodsConfigured = (profile: { contactMethods?: Record<string, { enabled?: boolean }> } | null | undefined): boolean => {
-	if (!profile?.contactMethods) return false
-	return Object.values(profile.contactMethods).some(m => m?.enabled)
+const hasContactMethodsConfigured = (profile: { contactMethods?: unknown } | null | undefined): boolean => {
+	if (!profile?.contactMethods || typeof profile.contactMethods !== 'object') return false
+	return Object.values(profile.contactMethods as Record<string, { enabled?: boolean }>).some(m => m?.enabled)
 }
 
 export const Layout: FC<LayoutProps> = ({ children }) => {

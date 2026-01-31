@@ -1,9 +1,7 @@
 import { type FC } from 'react'
-import { Card, Text, Group } from '@mantine/core'
-import { IconBuilding } from '@tabler/icons-react'
+import { Text } from '@mantine/core'
 
 import { Loader, EmptyState } from '@/shared/kit'
-import { LocationInfo } from '@/shared/components/LocationInfo'
 import { usePublicBooking } from '../hooks/usePublicBooking'
 import { OwnerCard } from '../components/OwnerCard'
 import { BookingForm } from '../components/BookingForm'
