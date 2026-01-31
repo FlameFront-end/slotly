@@ -1,8 +1,8 @@
 .locationInfo {
 	display: flex;
 	flex-direction: column;
-	gap: 10px;
-	margin-top: 12px;
+	gap: 12px;
+	margin-top: 0;
 	width: 100%;
 }
 
@@ -11,6 +11,8 @@
 	flex-wrap: wrap;
 	max-width: 100%;
 	overflow: hidden;
+	gap: 8px;
+	display: flex;
 }
 
 .address {
@@ -18,10 +20,12 @@
 	align-items: center;
 	gap: 8px;
 	color: var(--text-secondary);
-	padding: 8px 12px;
-	background-color: rgba(77, 171, 247, 0.05);
-	border-radius: 8px;
-	border: 1px solid rgba(77, 171, 247, 0.1);
+	padding: 10px 14px;
+	background-color: rgba(77, 171, 247, 0.06);
+	border-radius: 10px;
+	border: 1px solid rgba(77, 171, 247, 0.12);
+	font-size: 14px;
+	line-height: 1.5;
 }
 
 .mapLink,
@@ -33,10 +37,10 @@
 	text-decoration: none;
 	font-size: 14px;
 	font-weight: 500;
-	padding: 8px 12px;
+	padding: 10px 14px;
 	background-color: rgba(77, 171, 247, 0.08);
 	border: 1px solid rgba(77, 171, 247, 0.2);
-	border-radius: 8px;
+	border-radius: 10px;
 	transition: all 0.2s ease;
 	max-width: 100%;
 	min-width: 0;
@@ -46,9 +50,11 @@
 	box-sizing: border-box;
 
 	&:hover {
-		background-color: rgba(77, 171, 247, 0.15);
-		border-color: rgba(77, 171, 247, 0.4);
-		transform: translateY(-1px);
+		background-color: var(--primary);
+		color: white;
+		border-color: var(--primary);
+		transform: translateY(-2px);
+		box-shadow: 0 4px 8px rgba(77, 171, 247, 0.3);
 	}
 
 	span {

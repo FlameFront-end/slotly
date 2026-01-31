@@ -1,9 +1,14 @@
-import { type FC, useRef, useEffect, type ComponentType } from 'react'
+import { type FC, useRef, useEffect, type ComponentType, useCallback } from 'react'
 import { Card, Text, Group, Anchor } from '@mantine/core'
 import { IconBuilding } from '@tabler/icons-react'
 import { LocationInfo } from '@/shared/components/LocationInfo'
 import { formatSocialLink } from '@/shared/lib/formatting'
 import s from './OwnerCard.module.scss'
+
+const SCROLL_DELAY_MS = 700
+const DESCRIPTION_LENGTH_THRESHOLD = 150
+const SCROLL_OFFSET = 100
+const VIEWPORT_HEIGHT_THRESHOLD = 0.9
 
 interface SocialLink {
   type: string
@@ -22,6 +27,92 @@ interface Props {
   onToggleDescription: () => void
 }
 
+const scrollToElement = (element: HTMLElement) => {
+  const rect = element.getBoundingClientRect()
+  const elementTop = rect.top + window.pageYOffset
+  const elementHeight = rect.height
+  const windowHeight = window.innerHeight
+  const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+
+  const elementBottom = elementTop + elementHeight
+  const viewportBottom = scrollTop + windowHeight
+  const isLargeElement = elementHeight > windowHeight * VIEWPORT_HEIGHT_THRESHOLD
+  const isOutOfView = elementBottom > viewportBottom
+
+  let scrollTo: number
+  if (isLargeElement || isOutOfView) {
+    scrollTo = elementTop - SCROLL_OFFSET
+  } else {
+    scrollTo = elementTop - (windowHeight - elementHeight) / 2
+  }
+
+  window.scrollTo({
+    top: Math.max(0, scrollTo),
+    behavior: 'smooth'
+  })
+}
+
+interface DescriptionProps {
+  description: string
+  isExpanded: boolean
+  onToggle: () => void
+}
+
+const Description: FC<DescriptionProps> = ({ description, isExpanded, onToggle }) => {
+  const showExpandButton = description.length > DESCRIPTION_LENGTH_THRESHOLD
+
+  return (
+    <div className={s.descriptionWrapper}>
+      <Text
+        size="sm"
+        c="dimmed"
+        className={s.ownerDescription}
+        lineClamp={isExpanded ? undefined : 3}
+      >
+        {description}
+      </Text>
+      {showExpandButton && (
+        <span className={s.expandButtonWrapper}>
+          <button
+            type="button"
+            onClick={onToggle}
+            className={s.expandButtonInline}
+          >
+            {isExpanded ? 'Свернуть' : 'Развернуть'}
+          </button>
+        </span>
+      )}
+    </div>
+  )
+}
+
+interface SocialLinksProps {
+  links: SocialLink[]
+}
+
+const SocialLinks: FC<SocialLinksProps> = ({ links }) => {
+  if (links.length === 0) return null
+
+  return (
+    <Group gap="xs" className={s.socialLinks}>
+      {links.map(link => {
+        const Icon = link.icon
+        return (
+          <Anchor
+            key={link.type}
+            href={formatSocialLink(link.type, link.value)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={s.socialLink}
+          >
+            <Icon size={20} stroke={1.5} />
+          </Anchor>
+        )
+      })}
+    </Group>
+  )
+}
+
 export const OwnerCard: FC<Props> = ({
   name,
   description,
@@ -32,94 +123,44 @@ export const OwnerCard: FC<Props> = ({
   isDescriptionExpanded,
   onToggleDescription
 }) => {
-  const descriptionRef = useRef<HTMLDivElement>(null)
+  const cardRef = useRef<HTMLDivElement>(null)
+
+  const handleScroll = useCallback(() => {
+    if (!cardRef.current) return
+    scrollToElement(cardRef.current)
+  }, [])
 
   useEffect(() => {
-    if (isDescriptionExpanded && descriptionRef.current) {
-      const timeoutId = setTimeout(() => {
-        const element = descriptionRef.current
-        if (!element) return
+    if (!isDescriptionExpanded) return
 
-        const elementRect = element.getBoundingClientRect()
-        const elementTop = elementRect.top + window.pageYOffset
-        const elementHeight = elementRect.height
-        const windowHeight = window.innerHeight
-        const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop
-
-        const elementBottom = elementTop + elementHeight
-        const viewportBottom = currentScrollTop + windowHeight
-
-        if (elementHeight > windowHeight * 0.9 || elementBottom > viewportBottom) {
-          const scrollTo = elementTop - 100
-          window.scrollTo({
-            top: Math.max(0, scrollTo),
-            behavior: 'smooth'
-          })
-        } else {
-          const scrollTo = elementTop - (windowHeight - elementHeight) / 2
-          window.scrollTo({
-            top: Math.max(0, scrollTo),
-            behavior: 'smooth'
-          })
-        }
-      }, 700)
-
-      return () => clearTimeout(timeoutId)
-    }
-  }, [isDescriptionExpanded])
+    const timeoutId = setTimeout(handleScroll, SCROLL_DELAY_MS)
+    return () => clearTimeout(timeoutId)
+  }, [isDescriptionExpanded, handleScroll])
 
   return (
-    <Card className={s.ownerCard} padding={0} radius="md" withBorder={false} ref={descriptionRef}>
+    <Card className={s.ownerCard} ref={cardRef}>
       <div className={s.ownerCardHeader}>
         <div className={s.ownerIconWrapper}>
           <IconBuilding size={32} stroke={2} />
         </div>
-        <Text fw={700} size="lg" className={s.ownerName}>{name}</Text>
+        <div className={s.ownerInfo}>
+          <Text fw={700} size="lg" className={s.ownerName}>
+            {name}
+          </Text>
+          {description && (
+            <Description
+              description={description}
+              isExpanded={isDescriptionExpanded}
+              onToggle={onToggleDescription}
+            />
+          )}
+        </div>
       </div>
-      {description && (
-        <>
-          <div className={s.descriptionWrapper}>
-            <Text
-              size="sm"
-              c="dimmed"
-              className={s.ownerDescription}
-              lineClamp={isDescriptionExpanded ? undefined : 3}
-            >
-              {description}
-            </Text>
-            {description.length > 150 && (
-              <span className={s.expandButtonWrapper}>
-                <button
-                  type="button"
-                  onClick={onToggleDescription}
-                  className={s.expandButtonInline}
-                >
-                  {isDescriptionExpanded ? 'Свернуть' : 'Развернуть'}
-                </button>
-              </span>
-            )}
-          </div>
-        </>
-      )}
-      <LocationInfo address={address} mapLink={mapLink} website={website} />
-      {socialLinks.length > 0 && (
-        <Group gap="xs" mt="md" className={s.socialLinks}>
-          {socialLinks.map(link => {
-            const Icon = link.icon
-            return (
-              <Anchor
-                key={link.type}
-                href={formatSocialLink(link.type, link.value)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={s.socialLink}
-              >
-                <Icon size={20} stroke={1.5} />
-              </Anchor>
-            )
-          })}
-        </Group>
-      )}
+
+      <div className={s.ownerCardActions}>
+        <LocationInfo address={address} mapLink={mapLink} website={website} />
+        <SocialLinks links={socialLinks} />
+      </div>
     </Card>
   )
 }
