@@ -28,7 +28,9 @@ import { RefreshToken } from './features/auth/entities/refresh-token.entity';
         password: configService.get<string>('DB_PASSWORD', 'postgres'),
         database: configService.get<string>('DB_DATABASE', 'slotly'),
         entities: [User, OwnerProfile, Schedule, Booking, RefreshToken],
-        synchronize: configService.get<string>('NODE_ENV') === 'development',
+        synchronize:
+          configService.get<string>('DB_SYNCHRONIZE') === 'true' ||
+          configService.get<string>('NODE_ENV') === 'development',
         logging: configService.get<string>('NODE_ENV') === 'development',
       }),
       inject: [ConfigService],
