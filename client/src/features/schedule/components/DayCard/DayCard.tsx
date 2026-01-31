@@ -151,8 +151,8 @@ export const DayCard: FC<DayCardProps> = ({
 									type="button"
 									variant="subtle"
 									onClick={() => onAddTimeBlock(batchCount, batchDuration)}
-									size="sm"
-									fullWidth
+									size="xs"
+									className={s.batchAddButton}
 								>
 									Добавить {batchCount} × {batchDuration} мин
 								</Button>

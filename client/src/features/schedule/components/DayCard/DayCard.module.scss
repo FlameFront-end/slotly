@@ -199,7 +199,7 @@
 	display: grid;
 	grid-template-columns: repeat(2, minmax(72px, 1fr));
 	gap: 8px;
-	align-items: stretch;
+	align-items: end;
 
 	:global(.mantine-Button-root) {
 		grid-column: 1 / -1;
@@ -207,11 +207,18 @@
 
 	@media (min-width: 769px) {
 		grid-template-columns: 72px 110px 1fr;
+		align-items: end;
 
 		:global(.mantine-Button-root) {
 			grid-column: auto;
+			justify-self: start;
 		}
 	}
+}
+
+.batchAddButton {
+	width: fit-content !important;
+	min-width: 0;
 }
 
 .batchField {
