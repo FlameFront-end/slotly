@@ -1,8 +1,10 @@
-import { type FC } from 'react'
-import { TextInput, ActionIcon } from '@mantine/core'
+import { type FC, useMemo } from 'react'
+import { TextInput, ActionIcon, Select } from '@mantine/core'
 import { IconTrash } from '@tabler/icons-react'
 
 import { type TimeBlock as TimeBlockType } from '@/shared/api/services/schedule/types'
+import { type Service } from '@/shared/api/services/services/types'
+import { getActiveServices, createServiceSelectOptions } from '@/shared/utils/service.utils'
 
 import s from './TimeBlock.module.scss'
 
@@ -11,8 +13,16 @@ interface TimeBlockProps {
 	blockIndex: number
 	mode: 'simple' | 'advanced'
 	totalBlocks: number
-	onChange: (field: keyof TimeBlockType, value: string | number) => void
+	services?: Service[]
+	onChange: (field: keyof TimeBlockType, value: string | number | null) => void
 	onRemove?: () => void
+}
+
+const getTimeLabel = (mode: 'simple' | 'advanced', type: 'start' | 'end'): string => {
+	if (mode === 'simple') {
+		return type === 'start' ? 'Начало рабочего дня' : 'Конец рабочего дня'
+	}
+	return type === 'start' ? 'Начало приёма' : 'Конец приёма'
 }
 
 export const TimeBlock: FC<TimeBlockProps> = ({
@@ -20,9 +30,18 @@ export const TimeBlock: FC<TimeBlockProps> = ({
 	blockIndex,
 	mode,
 	totalBlocks,
+	services = [],
 	onChange,
 	onRemove
 }) => {
+	const activeServices = useMemo(() => getActiveServices(services), [services])
+	const serviceOptions = useMemo(
+		() => createServiceSelectOptions(activeServices),
+		[activeServices]
+	)
+	
+	const showServiceSelect = mode === 'advanced' && activeServices.length > 0
+
 	return (
 		<div className={s.timeBlock}>
 			{mode === 'advanced' && totalBlocks > 1 && (
@@ -41,9 +60,9 @@ export const TimeBlock: FC<TimeBlockProps> = ({
 					)}
 				</div>
 			)}
-			<div className={s.timeBlockFields}>
+			<div className={`${s.timeBlockFields} ${mode === 'simple' ? s.simpleMode : ''}`}>
 				<TextInput
-					label="Начало приёма"
+					label={getTimeLabel(mode, 'start')}
 					type="time"
 					value={block.startTime}
 					onChange={e => onChange('startTime', e.target.value)}
@@ -51,12 +70,33 @@ export const TimeBlock: FC<TimeBlockProps> = ({
 				/>
 
 				<TextInput
-					label="Конец приёма"
+					label={getTimeLabel(mode, 'end')}
 					type="time"
 					value={block.endTime}
 					onChange={e => onChange('endTime', e.target.value)}
 					size="sm"
+					readOnly
+					styles={{
+						input: {
+							cursor: 'default',
+							backgroundColor: 'var(--bg-secondary)'
+						}
+					}}
 				/>
+
+				{showServiceSelect && (
+					<Select
+						label="Услуга"
+						placeholder="Выберите услугу"
+						data={serviceOptions}
+						value={block.serviceId || ''}
+						onChange={(value) => onChange('serviceId', value || null)}
+						size="sm"
+						required
+						searchable
+						className={s.serviceSelect}
+					/>
+				)}
 			</div>
 		</div>
 	)

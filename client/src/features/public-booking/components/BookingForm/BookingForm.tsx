@@ -1,7 +1,8 @@
-import { type FC, useMemo, useState, type ComponentType } from 'react'
+import { type FC, useMemo, useState, useCallback, type ComponentType } from 'react'
 import { Card, Stack, Group, Text, Select, Radio, Divider, ActionIcon } from '@mantine/core'
-import { IconCalendar, IconClock, IconUser, IconCheck, IconChevronLeft, IconChevronRight } from '@tabler/icons-react'
+import { IconCalendar, IconClock, IconUser, IconCheck, IconChevronLeft, IconChevronRight, IconBriefcase } from '@tabler/icons-react'
 import { Button, Input } from '@/shared/kit'
+import { createServiceSelectOptions } from '@/shared/utils/service.utils'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ru'
 import s from './BookingForm.module.scss'
@@ -20,9 +21,18 @@ interface TimeOption {
   label: string
 }
 
+interface Service {
+  id: string
+  name: string
+  description: string | null
+  duration: number
+  price: number | null
+}
+
 interface Props {
   selectedDate: string
   selectedTime: string
+  selectedServiceId: string
   clientName: string
   selectedContactMethod: string
   clientContact: string
@@ -31,8 +41,10 @@ interface Props {
   availableTimes: string[]
   availableTimesWithEnd: TimeOption[]
   availableContactMethods: ContactMethod[]
+  services: Service[]
   onDateChange: (value: string) => void
   onTimeChange: (value: string) => void
+  onServiceChange: (value: string) => void
   onNameChange: (value: string) => void
   onContactMethodChange: (value: string) => void
   onContactChange: (value: string) => void
@@ -44,6 +56,7 @@ interface Props {
 export const BookingForm: FC<Props> = ({
   selectedDate,
   selectedTime,
+  selectedServiceId,
   clientName,
   selectedContactMethod,
   clientContact,
@@ -52,8 +65,10 @@ export const BookingForm: FC<Props> = ({
   availableTimes,
   availableTimesWithEnd,
   availableContactMethods,
+  services,
   onDateChange,
   onTimeChange,
+  onServiceChange,
   onNameChange,
   onContactMethodChange,
   onContactChange,
@@ -61,33 +76,58 @@ export const BookingForm: FC<Props> = ({
   onSubmit,
   isPending
 }) => {
-  const getContactLabel = (method: string): string => {
-    if (method === 'telegram') return 'Ваш Telegram'
-    if (method === 'email') return 'Ваш Email'
-    if (method === 'phone') return 'Ваш телефон'
-    if (method === 'whatsapp') return 'Ваш WhatsApp'
-    return ''
-  }
+  const getContactLabel = useCallback((method: string): string => {
+    const labels: Record<string, string> = {
+      telegram: 'Ваш Telegram',
+      email: 'Ваш Email',
+      phone: 'Ваш телефон',
+      whatsapp: 'Ваш WhatsApp'
+    }
+    return labels[method] ?? ''
+  }, [])
 
-  const getContactPlaceholder = (method: string): string => {
-    if (method === 'telegram') return '@username или t.me/username'
-    if (method === 'email') return 'example@email.com'
-    return '+7 (999) 123-45-67'
-  }
+  const getContactPlaceholder = useCallback((method: string): string => {
+    const placeholders: Record<string, string> = {
+      telegram: '@username или t.me/username',
+      email: 'example@email.com',
+      phone: '+7 (999) 123-45-67',
+      whatsapp: '+7 (999) 123-45-67'
+    }
+    return placeholders[method] ?? '+7 (999) 123-45-67'
+  }, [])
 
-  const getContactType = (method: string): string => {
+  const getContactType = useCallback((method: string): string => {
     if (method === 'email') return 'email'
     if (method === 'phone' || method === 'whatsapp') return 'tel'
     return 'text'
-  }
+  }, [])
 
-  const selectedMethod = availableContactMethods.find(m => m.type === selectedContactMethod)
-  const ContactIcon = selectedMethod ? selectedMethod.icon : null
+  const handleServiceChange = useCallback((value: string | null) => {
+    onServiceChange(value || '')
+    onDateChange('')
+    onTimeChange('')
+  }, [onServiceChange, onDateChange, onTimeChange])
 
-  const formatSelectedDate = (dateStr: string): string => {
+  const selectedMethod = useMemo(
+    () => availableContactMethods.find(m => m.type === selectedContactMethod),
+    [availableContactMethods, selectedContactMethod]
+  )
+  const ContactIcon = selectedMethod?.icon ?? null
+
+  const serviceOptions = useMemo(
+    () => createServiceSelectOptions(services),
+    [services]
+  )
+
+  const selectedService = useMemo(
+    () => services.find(s => s.id === selectedServiceId),
+    [services, selectedServiceId]
+  )
+
+  const formatSelectedDate = useCallback((dateStr: string): string => {
     if (!dateStr) return ''
     return dayjs(dateStr).format('D MMMM YYYY, dddd')
-  }
+  }, [])
 
   const [currentMonth, setCurrentMonth] = useState(() => dayjs().startOf('month'))
 
@@ -147,11 +187,34 @@ export const BookingForm: FC<Props> = ({
     <form onSubmit={onSubmit} className={s.form}>
       <Card padding="md" radius="md" withBorder className={s.formCard}>
         <Stack gap="lg">
-          <div className={s.dateSection}>
-            <Group gap="xs" mb="md">
-              <IconCalendar size={18} stroke={1.5} />
-              <Text fw={500} size="sm">Выберите дату</Text>
-            </Group>
+          {services.length > 0 && (
+            <div className={s.serviceSelectWrapper}>
+              <Group gap="xs" mb="xs">
+                <IconBriefcase size={18} stroke={1.5} />
+                <Text fw={500} size="sm">Выберите услугу</Text>
+              </Group>
+              <Select
+                placeholder="Выберите услугу"
+                value={selectedServiceId}
+                onChange={handleServiceChange}
+                data={serviceOptions}
+                required
+                size="md"
+              />
+              {selectedService?.description && (
+                <Text size="xs" c="dimmed" mt="xs">
+                  {selectedService.description}
+                </Text>
+              )}
+            </div>
+          )}
+
+          {(selectedServiceId || services.length === 0) && (
+            <div className={s.dateSection}>
+              <Group gap="xs" mb="md">
+                <IconCalendar size={18} stroke={1.5} />
+                <Text fw={500} size="sm">Выберите дату</Text>
+              </Group>
 
             {selectedDate && (
               <div className={s.selectedDateDisplay}>
@@ -223,9 +286,10 @@ export const BookingForm: FC<Props> = ({
                 Доступно дат: {availableDates.length}
               </Text>
             )}
-          </div>
+            </div>
+          )}
 
-          {selectedDate && availableTimes.length > 0 && (
+          {(selectedServiceId || services.length === 0) && selectedDate && availableTimes.length > 0 && (
             <div className={s.timeSelectWrapper}>
               <Group gap="xs" mb="xs">
                 <IconClock size={18} stroke={1.5} />
@@ -242,7 +306,7 @@ export const BookingForm: FC<Props> = ({
             </div>
           )}
 
-          {selectedDate && availableTimes.length === 0 && (
+          {(selectedServiceId || services.length === 0) && selectedDate && availableTimes.length === 0 && (
             <Card padding="md" radius="md" bg="var(--bg-secondary)" withBorder className={s.noSlotsCard}>
               <Text size="sm" c="dimmed" ta="center">
                 На выбранную дату нет свободного времени
@@ -252,7 +316,7 @@ export const BookingForm: FC<Props> = ({
         </Stack>
       </Card>
 
-      {selectedDate && selectedTime && availableContactMethods.length > 0 && (
+      {(selectedServiceId || services.length === 0) && selectedDate && selectedTime && availableContactMethods.length > 0 && (
         <Card padding="md" radius="md" withBorder className={`${s.formCard} ${s.contactCard}`}>
           <Stack gap="lg">
             <Divider label="Ваши контактные данные" labelPosition="center" />

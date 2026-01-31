@@ -8,6 +8,7 @@ import { Repository, Not, In, Between } from 'typeorm';
 import { OwnerProfile } from '../owner/entities/owner-profile.entity';
 import { Schedule } from '../schedule/entities/schedule.entity';
 import { Booking, BookingStatus } from '../bookings/entities/booking.entity';
+import { Service } from '../services/entities/service.entity';
 
 @Injectable()
 export class PublicService {
@@ -18,6 +19,8 @@ export class PublicService {
     private scheduleRepository: Repository<Schedule>,
     @InjectRepository(Booking)
     private bookingRepository: Repository<Booking>,
+    @InjectRepository(Service)
+    private serviceRepository: Repository<Service>,
   ) {}
 
   async getOwnerProfile(publicId: string): Promise<OwnerProfile> {
@@ -40,6 +43,13 @@ export class PublicService {
     status: string;
     clientName: string;
     clientContact: string;
+    service: {
+      id: string;
+      name: string;
+      description: string | null;
+      duration: number;
+      price: number | null;
+    } | null;
     owner: {
       publicId: string;
       name: string;
@@ -51,7 +61,7 @@ export class PublicService {
   }> {
     const booking = await this.bookingRepository.findOne({
       where: { id: bookingId },
-      relations: ['ownerProfile'],
+      relations: ['ownerProfile', 'service'],
     });
 
     if (!booking) {
@@ -66,6 +76,15 @@ export class PublicService {
       status: booking.status,
       clientName: booking.clientName,
       clientContact: booking.clientContact,
+      service: booking.service
+        ? {
+            id: booking.service.id,
+            name: booking.service.name,
+            description: booking.service.description ?? null,
+            duration: booking.service.duration,
+            price: booking.service.price ?? null,
+          }
+        : null,
       owner: {
         publicId: owner.publicId,
         name: owner.name,
@@ -106,6 +125,7 @@ export class PublicService {
     ownerPublicId: string,
     startDate?: string,
     endDate?: string,
+    serviceId?: string,
   ): Promise<Array<{ date: string; time: string; slotDuration?: number }>> {
     const profile = await this.ownerProfileRepository.findOne({
       where: { publicId: ownerPublicId },
@@ -210,6 +230,17 @@ export class PublicService {
 
       if (timeBlocks && timeBlocks.length > 0) {
         for (const timeBlock of timeBlocks) {
+          // Фильтруем по serviceId: показываем слот, если:
+          // 1. serviceId не указан в запросе (показываем все слоты)
+          // 2. serviceId совпадает с serviceId в timeBlock
+          // 3. serviceId в timeBlock не указан (null) - слот доступен для всех услуг
+          if (serviceId) {
+            const blockServiceId = (timeBlock as any).serviceId;
+            if (blockServiceId !== null && blockServiceId !== undefined && blockServiceId !== serviceId) {
+              continue; // Пропускаем этот блок, если serviceId не совпадает
+            }
+          }
+
           const slots = this.generateTimeSlots(
             timeBlock.startTime,
             timeBlock.endTime,
@@ -296,5 +327,20 @@ export class PublicService {
   private normalizeMonthsRange(months?: number): number {
     if (!months || !Number.isFinite(months)) return 2;
     return Math.min(24, Math.max(1, months));
+  }
+
+  async getServices(ownerPublicId: string): Promise<Service[]> {
+    const profile = await this.ownerProfileRepository.findOne({
+      where: { publicId: ownerPublicId },
+    });
+
+    if (!profile) {
+      throw new NotFoundException('Владелец не найден');
+    }
+
+    return this.serviceRepository.find({
+      where: { ownerId: profile.id, isActive: true },
+      order: { order: 'ASC', createdAt: 'ASC' },
+    });
   }
 }

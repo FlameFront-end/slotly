@@ -1,21 +1,33 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import dayjs from 'dayjs'
 import { notifications } from '@mantine/notifications'
 
 import { useSchedule, useUpdateSchedule } from '@/shared/api/services/schedule'
 import { getErrorMessage } from '@/shared/lib'
 import { type ScheduleDay, type ScheduleException, type TimeBlock } from '@/shared/api/services/schedule/types'
+import { type Service } from '@/shared/api/services/services/types'
+import { parseTimeToMinutes, formatMinutesToTime, calculateEndTime } from '@/shared/utils/time.utils'
 import { migrateScheduleDay, DAYS_OF_WEEK, createDefaultSchedule } from '../utils/schedule.utils'
 
-export const useScheduleForm = () => {
+const DEFAULT_START_TIME = '09:00'
+const DEFAULT_END_TIME = '18:00'
+const DEFAULT_SLOT_DURATION = 60
+const DEFAULT_BOOKING_RANGE_MONTHS = 2
+
+export const useScheduleForm = (services: Service[] = []) => {
 	const { data: schedule, isLoading } = useSchedule()
 	const updateMutation = useUpdateSchedule()
 
 	const [days, setDays] = useState<ScheduleDay[]>([])
 	const [dayModes, setDayModes] = useState<Record<number, 'simple' | 'advanced'>>({})
 	const [copiedDayIndex, setCopiedDayIndex] = useState<number | null>(null)
-	const [bookingRangeMonths, setBookingRangeMonths] = useState<number>(2)
+	const [bookingRangeMonths, setBookingRangeMonths] = useState<number>(DEFAULT_BOOKING_RANGE_MONTHS)
 	const [exceptions, setExceptions] = useState<ScheduleException[]>([])
+
+	const hasActiveServices = useMemo(
+		() => services.some(s => s.isActive),
+		[services]
+	)
 
 	useEffect(() => {
 		const defaultDays = createDefaultSchedule()
@@ -33,7 +45,7 @@ export const useScheduleForm = () => {
 			const allDays = Array.from(daysMap.values()).sort((a, b) => a.dayOfWeek - b.dayOfWeek)
 			
 			setDays(allDays)
-			setBookingRangeMonths(schedule.bookingRangeMonths || 2)
+			setBookingRangeMonths(schedule.bookingRangeMonths || DEFAULT_BOOKING_RANGE_MONTHS)
 			setExceptions(schedule.exceptions || [])
 			const modes: Record<number, 'simple' | 'advanced'> = {}
 			allDays.forEach(day => {
@@ -43,7 +55,7 @@ export const useScheduleForm = () => {
 		} else {
 			setDays(defaultDays)
 			setDayModes(defaultModes)
-			setBookingRangeMonths(2)
+			setBookingRangeMonths(DEFAULT_BOOKING_RANGE_MONTHS)
 			setExceptions([])
 		}
 	}, [schedule])
@@ -56,9 +68,9 @@ export const useScheduleForm = () => {
 					if (field === 'isActive' && value === true && (!updatedDay.timeBlocks || updatedDay.timeBlocks.length === 0)) {
 						updatedDay.timeBlocks = [
 							{
-								startTime: '09:00',
-								endTime: '18:00',
-								slotDuration: 60
+								startTime: DEFAULT_START_TIME,
+								endTime: calculateEndTime(DEFAULT_START_TIME, DEFAULT_SLOT_DURATION),
+								slotDuration: DEFAULT_SLOT_DURATION
 							}
 						]
 					}
@@ -75,10 +87,21 @@ export const useScheduleForm = () => {
 		if (mode === 'simple') {
 			setDays(prev =>
 				prev.map((day, i) => {
-					if (i === dayIndex && day.timeBlocks.length > 1) {
+					if (i === dayIndex) {
+						// Оставляем только первый блок и очищаем serviceId
+						const firstBlock = { ...day.timeBlocks[0] }
+						delete firstBlock.serviceId
+						
+						// Пересчитываем endTime на основе slotDuration (без услуги)
+						firstBlock.endTime = calculateEndTimeForBlock(
+							firstBlock.startTime,
+							null,
+							firstBlock.slotDuration
+						)
+						
 						return {
 							...day,
-							timeBlocks: [day.timeBlocks[0]]
+							timeBlocks: [firstBlock]
 						}
 					}
 					return day
@@ -87,20 +110,49 @@ export const useScheduleForm = () => {
 		}
 	}
 
+	const calculateEndTimeForBlock = useCallback((
+		startTime: string,
+		serviceId: string | null | undefined,
+		slotDuration: number
+	): string => {
+		// Если выбрана услуга, используем её длительность
+		if (serviceId) {
+			const service = services.find(s => s.id === serviceId)
+			if (service?.duration) {
+				return calculateEndTime(startTime, service.duration)
+			}
+		}
+		
+		// Иначе используем slotDuration
+		return calculateEndTime(startTime, slotDuration)
+	}, [services])
+
 	const handleTimeBlockChange = (
 		dayIndex: number,
 		blockIndex: number,
 		field: keyof TimeBlock,
-		value: string | number
+		value: string | number | null
 	): void => {
 		setDays(prev =>
 			prev.map((day, i) => {
 				if (i === dayIndex) {
 					const newTimeBlocks = [...day.timeBlocks]
-					newTimeBlocks[blockIndex] = {
-						...newTimeBlocks[blockIndex],
-						[field]: value
+					const currentBlock = { ...newTimeBlocks[blockIndex] }
+					
+					// Обновляем изменённое поле
+					currentBlock[field] = value
+					
+					// Автоматически пересчитываем endTime при изменении startTime, serviceId или slotDuration
+					const shouldRecalculateEndTime = field === 'startTime' || field === 'serviceId' || field === 'slotDuration'
+					if (shouldRecalculateEndTime) {
+						const startTime = field === 'startTime' ? (value as string) : currentBlock.startTime
+						const serviceId = field === 'serviceId' ? (value as string | null) : currentBlock.serviceId
+						const slotDuration = field === 'slotDuration' ? (value as number) : currentBlock.slotDuration
+						
+						currentBlock.endTime = calculateEndTimeForBlock(startTime, serviceId, slotDuration)
 					}
+					
+					newTimeBlocks[blockIndex] = currentBlock
 					return { ...day, timeBlocks: newTimeBlocks }
 				}
 				return day
@@ -108,45 +160,50 @@ export const useScheduleForm = () => {
 		)
 	}
 
-	const parseTimeToMinutes = (time: string): number => {
-		const [hours, minutes] = time.split(':').map(Number)
-		return hours * 60 + minutes
-	}
 
-	const formatMinutesToTime = (totalMinutes: number): string => {
-		const clamped = Math.min(totalMinutes, 23 * 60 + 59)
-		const hours = Math.floor(clamped / 60)
-		const minutes = clamped % 60
-		return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
-	}
-
-	const addTimeBlocks = (dayIndex: number, count: number = 1, durationMinutes: number = 60): void => {
+	const addTimeBlocks = useCallback((
+		dayIndex: number,
+		count: number = 1,
+		durationMinutes: number = DEFAULT_SLOT_DURATION,
+		serviceId?: string | null
+	): void => {
 		setDays(prev =>
 			prev.map((day, i) => {
-				if (i === dayIndex) {
-					const newBlocks = [...day.timeBlocks]
-					const lastBlock = newBlocks[newBlocks.length - 1]
-					const safeDuration = Number.isFinite(durationMinutes) && durationMinutes > 0 ? durationMinutes : 60
-					let startTime = lastBlock?.endTime || '09:00'
+				if (i !== dayIndex) return day
 
-					for (let idx = 0; idx < count; idx += 1) {
-						const endTime = formatMinutesToTime(parseTimeToMinutes(startTime) + safeDuration)
-						newBlocks.push({
-							startTime,
-							endTime,
-							slotDuration: safeDuration
-						})
-						startTime = endTime
-					}
-					return {
-						...day,
-						timeBlocks: newBlocks
-					}
+				const newBlocks = [...day.timeBlocks]
+				const lastBlock = newBlocks[newBlocks.length - 1]
+				const safeDuration = Number.isFinite(durationMinutes) && durationMinutes > 0 
+					? durationMinutes 
+					: DEFAULT_SLOT_DURATION
+				let startTime = lastBlock?.endTime || DEFAULT_START_TIME
+
+				// Если есть активные услуги, serviceId обязателен
+				const finalServiceId = hasActiveServices && !serviceId ? null : (serviceId || null)
+
+				for (let idx = 0; idx < count; idx += 1) {
+					// Если выбрана услуга, используем её длительность, иначе используем durationMinutes
+					const selectedService = finalServiceId ? services.find(s => s.id === finalServiceId) : null
+					const blockDuration = selectedService?.duration || safeDuration
+					
+					const endTime = calculateEndTimeForBlock(startTime, finalServiceId, blockDuration)
+					
+					newBlocks.push({
+						startTime,
+						endTime,
+						slotDuration: blockDuration,
+						serviceId: finalServiceId
+					})
+					startTime = endTime
 				}
-				return day
+				
+				return {
+					...day,
+					timeBlocks: newBlocks
+				}
 			})
 		)
-	}
+	}, [services, hasActiveServices, calculateEndTimeForBlock])
 
 	const removeTimeBlock = (dayIndex: number, blockIndex: number): void => {
 		setDays(prev =>
@@ -207,8 +264,8 @@ export const useScheduleForm = () => {
 				id: `exception-${date}`,
 				date,
 				isAvailable: true,
-				startTime: baseBlock?.startTime || '09:00',
-				endTime: baseBlock?.endTime || '18:00'
+				startTime: baseBlock?.startTime || DEFAULT_START_TIME,
+				endTime: baseBlock?.endTime || DEFAULT_END_TIME
 			}
 			return [...prev, newException].sort((a, b) => a.date.localeCompare(b.date))
 		})

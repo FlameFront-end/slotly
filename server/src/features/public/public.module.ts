@@ -5,9 +5,10 @@ import { PublicController } from './public.controller';
 import { OwnerProfile } from '../owner/entities/owner-profile.entity';
 import { Schedule } from '../schedule/entities/schedule.entity';
 import { Booking } from '../bookings/entities/booking.entity';
+import { Service } from '../services/entities/service.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([OwnerProfile, Schedule, Booking])],
+  imports: [TypeOrmModule.forFeature([OwnerProfile, Schedule, Booking, Service])],
   controllers: [PublicController],
   providers: [PublicService],
 })

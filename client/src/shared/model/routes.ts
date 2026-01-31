@@ -6,6 +6,7 @@ export const ROUTES = {
 	PROFILE: '/profile',
 	SCHEDULE: '/schedule',
 	BOOKINGS: '/bookings',
+	SERVICES: '/services',
 
 	PUBLIC_BOOKING: '/public/booking/:ownerId',
 	PUBLIC_BOOKING_CONFIRMATION: '/public/booking-confirmation/:bookingId'

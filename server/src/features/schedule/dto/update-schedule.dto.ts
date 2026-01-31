@@ -32,6 +32,11 @@ export class TimeBlockDto {
   @IsNumber()
   @Min(1)
   slotDuration: number;
+
+  @ApiProperty({ required: false, example: 'uuid-of-service', description: 'ID услуги для этого временного блока' })
+  @IsOptional()
+  @IsString()
+  serviceId?: string | null;
 }
 
 export class ScheduleDayDto {

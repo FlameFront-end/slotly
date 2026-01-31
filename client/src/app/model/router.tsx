@@ -39,6 +39,10 @@ export const router = createBrowserRouter([
 				lazy: () => import('../../features/bookings/pages/bookings.page')
 			},
 			{
+				path: ROUTES.SERVICES,
+				lazy: () => import('../../features/services/pages/services.page')
+			},
+			{
 				path: ROUTES.PUBLIC_BOOKING,
 				lazy: () => import('../../features/public-booking/pages/public-booking.page')
 			},

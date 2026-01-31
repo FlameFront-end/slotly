@@ -15,10 +15,13 @@ export const scheduleApi = {
 		return response.data
 	},
 
-	getAvailableSlots: async (ownerId: string, startDate: string, endDate?: string): Promise<AvailableSlot[]> => {
+	getAvailableSlots: async (ownerId: string, startDate: string, endDate?: string, serviceId?: string): Promise<AvailableSlot[]> => {
 		const params: Record<string, string> = { start_date: startDate }
 		if (endDate) {
 			params.end_date = endDate
+		}
+		if (serviceId) {
+			params.service_id = serviceId
 		}
 		const response = await axiosInstance.get<AvailableSlot[]>(
 			`/public/schedule/${ownerId}/slots`,
@@ -48,10 +51,10 @@ export const useUpdateSchedule = () => {
 	})
 }
 
-export const useAvailableSlots = (ownerId: string, startDate: string, endDate?: string) => {
+export const useAvailableSlots = (ownerId: string, startDate: string, endDate?: string, serviceId?: string) => {
 	return useQuery({
-		queryKey: ['schedule', 'slots', ownerId, startDate, endDate ?? 'default'],
-		queryFn: () => scheduleApi.getAvailableSlots(ownerId, startDate, endDate),
+		queryKey: ['schedule', 'slots', ownerId, startDate, endDate ?? 'default', serviceId ?? 'all'],
+		queryFn: () => scheduleApi.getAvailableSlots(ownerId, startDate, endDate, serviceId),
 		enabled: !!ownerId && !!startDate
 	})
 }

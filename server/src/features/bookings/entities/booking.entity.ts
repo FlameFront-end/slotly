@@ -9,6 +9,7 @@ import {
   Index,
 } from 'typeorm';
 import type { OwnerProfile } from '../../owner/entities/owner-profile.entity';
+import type { Service } from '../../services/entities/service.entity';
 
 export enum BookingStatus {
   PENDING = 'pending',
@@ -58,6 +59,18 @@ export class Booking {
   })
   @Index()
   status: BookingStatus;
+
+  @Column({ name: 'service_id', nullable: true })
+  @Index()
+  serviceId: string | null;
+
+  @ManyToOne(
+    () => require('../../services/entities/service.entity').Service,
+    (service: Service) => service.bookings,
+    { nullable: true },
+  )
+  @JoinColumn({ name: 'service_id' })
+  service: Service | null;
 
   @Column({ name: 'read_at', type: 'timestamp', nullable: true })
   readAt: Date | null = null;

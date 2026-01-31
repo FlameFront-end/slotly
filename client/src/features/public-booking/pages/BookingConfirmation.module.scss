@@ -127,6 +127,31 @@
   font-weight: 600;
 }
 
+.serviceInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.serviceName {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.serviceMeta {
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.servicePrice {
+  font-weight: 500;
+  color: var(--primary);
+}
+
 .locationSection {
   width: 100%;
   padding-top: 4px;

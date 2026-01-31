@@ -57,14 +57,20 @@
 	grid-template-columns: repeat(3, 1fr);
 	gap: 16px;
 	
+	&.simpleMode {
+		grid-template-columns: repeat(2, 1fr);
+	}
+	
 	:global(.mantine-TextInput-root),
-	:global(.mantine-NumberInput-root) {
+	:global(.mantine-NumberInput-root),
+	:global(.mantine-Select-root) {
 		display: flex;
 		flex-direction: column;
 	}
 	
 	:global(.mantine-TextInput-input),
-	:global(.mantine-NumberInput-input) {
+	:global(.mantine-NumberInput-input),
+	:global(.mantine-Select-input) {
 		transition: all 0.2s ease;
 		
 		&:focus {
@@ -76,6 +82,16 @@
 	@media (max-width: 768px) {
 		grid-template-columns: 1fr;
 		gap: 12px;
+		
+		&.simpleMode {
+			grid-template-columns: 1fr;
+		}
+	}
+}
+
+.serviceSelect {
+	:global(.mantine-Select-input) {
+		font-size: 13px;
 	}
 }
 

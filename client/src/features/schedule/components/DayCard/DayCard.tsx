@@ -1,9 +1,11 @@
-import { type FC, useState } from 'react'
-import { Checkbox, Group, NumberInput, Text } from '@mantine/core'
+import { type FC, useState, useMemo, useCallback } from 'react'
+import { Checkbox, Group, NumberInput, Text, Select } from '@mantine/core'
 import { IconClock, IconPlus } from '@tabler/icons-react'
 
 import { type ScheduleDay, type TimeBlock } from '@/shared/api/services/schedule/types'
+import { type Service } from '@/shared/api/services/services/types'
 import { DAYS_OF_WEEK, formatTimeRange, isWeekend } from '../../utils/schedule.utils'
+import { getActiveServices, createServiceSelectOptions } from '@/shared/utils/service.utils'
 import { Button } from '@/shared/kit'
 
 import { ModeSelector } from '../ModeSelector/ModeSelector'
@@ -19,10 +21,11 @@ interface DayCardProps {
 	copiedDayIndex: number | null
 	activeDays: ScheduleDay[]
 	allDays: ScheduleDay[]
+	services?: Service[]
 	onActiveChange: (active: boolean) => void
 	onModeChange: (mode: 'simple' | 'advanced') => void
-	onTimeBlockChange: (blockIndex: number, field: keyof TimeBlock, value: string | number) => void
-	onAddTimeBlock: (count: number, durationMinutes: number) => void
+	onTimeBlockChange: (blockIndex: number, field: keyof TimeBlock, value: string | number | null) => void
+	onAddTimeBlock: (count: number, durationMinutes: number, serviceId?: string | null) => void
 	onRemoveTimeBlock: (blockIndex: number) => void
 	onCopySettings: (sourceIndex: number, targetIndex: number) => void
 }
@@ -34,6 +37,7 @@ export const DayCard: FC<DayCardProps> = ({
 	copiedDayIndex,
 	activeDays,
 	allDays,
+	services = [],
 	onActiveChange,
 	onModeChange,
 	onTimeBlockChange,
@@ -43,19 +47,38 @@ export const DayCard: FC<DayCardProps> = ({
 }) => {
 	const [batchCount, setBatchCount] = useState(3)
 	const [batchDuration, setBatchDuration] = useState(60)
+	const [batchServiceId, setBatchServiceId] = useState<string | null>(null)
 
-	const handleBatchChange = (value: string | number): void => {
+	const activeServices = useMemo(() => getActiveServices(services), [services])
+	const serviceOptions = useMemo(
+		() => createServiceSelectOptions(activeServices),
+		[activeServices]
+	)
+	
+	const isServiceRequired = activeServices.length > 0
+	const isAddButtonDisabled = isServiceRequired && !batchServiceId
+
+	const handleBatchChange = useCallback((value: string | number): void => {
 		const parsed = typeof value === 'number' ? value : Number(value)
 		const normalized = Number.isFinite(parsed) ? parsed : 2
 		const clamped = Math.max(2, Math.min(12, normalized))
 		setBatchCount(clamped)
-	}
-	const handleDurationChange = (value: string | number): void => {
+	}, [])
+
+	const handleDurationChange = useCallback((value: string | number): void => {
 		const parsed = typeof value === 'number' ? value : Number(value)
 		const normalized = Number.isFinite(parsed) ? parsed : 60
 		const clamped = Math.max(15, Math.min(480, normalized))
 		setBatchDuration(clamped)
-	}
+	}, [])
+
+	const handleAddSingleBlock = useCallback(() => {
+		onAddTimeBlock(1, batchDuration, batchServiceId || undefined)
+	}, [onAddTimeBlock, batchDuration, batchServiceId])
+
+	const handleAddMultipleBlocks = useCallback(() => {
+		onAddTimeBlock(batchCount, batchDuration, batchServiceId || undefined)
+	}, [onAddTimeBlock, batchCount, batchDuration, batchServiceId])
 
 	return (
 		<div 
@@ -99,6 +122,7 @@ export const DayCard: FC<DayCardProps> = ({
 							blockIndex={blockIndex}
 							mode={mode}
 							totalBlocks={day.timeBlocks.length}
+							services={services}
 							onChange={(field, value) => onTimeBlockChange(blockIndex, field, value)}
 							onRemove={day.timeBlocks.length > 1 ? () => onRemoveTimeBlock(blockIndex) : undefined}
 						/>
@@ -110,10 +134,11 @@ export const DayCard: FC<DayCardProps> = ({
 								type="button"
 								variant="light"
 								leftSection={<IconPlus size={16} />}
-								onClick={() => onAddTimeBlock(1, batchDuration)}
+								onClick={handleAddSingleBlock}
 								size="sm"
 								fullWidth
 								className={s.addBlockButton}
+								disabled={isAddButtonDisabled}
 							>
 								Добавить интервал
 							</Button>
@@ -147,12 +172,28 @@ export const DayCard: FC<DayCardProps> = ({
 										className={s.batchInput}
 									/>
 								</div>
+								{isServiceRequired && (
+									<div className={s.batchField}>
+										<Text size="xs" c="dimmed">Услуга</Text>
+										<Select
+											data={serviceOptions}
+											value={batchServiceId || ''}
+											onChange={(value) => setBatchServiceId(value || null)}
+											size="xs"
+											required
+											searchable
+											placeholder="Выберите услугу"
+											className={s.batchServiceSelect}
+										/>
+									</div>
+								)}
 								<Button
 									type="button"
 									variant="subtle"
-									onClick={() => onAddTimeBlock(batchCount, batchDuration)}
+									onClick={handleAddMultipleBlocks}
 									size="xs"
 									className={s.batchAddButton}
+									disabled={isAddButtonDisabled}
 								>
 									Добавить {batchCount} × {batchDuration} мин
 								</Button>

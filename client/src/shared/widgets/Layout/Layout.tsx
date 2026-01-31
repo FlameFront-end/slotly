@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 
 import { Group, Burger, Drawer, Stack, Divider } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { IconHome, IconUser, IconCalendar, IconBook, IconLogout } from '@tabler/icons-react'
+import { IconHome, IconUser, IconCalendar, IconBook, IconLogout, IconBriefcase } from '@tabler/icons-react'
 
 import { useLogout } from '@/shared/api/services/auth'
 import { useOwnerProfile } from '@/shared/api/services/owner'
@@ -109,7 +109,8 @@ export const Layout: FC<LayoutProps> = ({ children }) => {
 		{ path: ROUTES.DASHBOARD, label: 'Главная', index: 0, icon: IconHome },
 		{ path: ROUTES.PROFILE, label: 'Профиль', index: 1, icon: IconUser },
 		{ path: ROUTES.SCHEDULE, label: 'Расписание', index: 2, icon: IconCalendar },
-		{ path: ROUTES.BOOKINGS, label: 'Записи', index: 3, icon: IconBook }
+		{ path: ROUTES.BOOKINGS, label: 'Записи', index: 3, icon: IconBook },
+		{ path: ROUTES.SERVICES, label: 'Услуги', index: 4, icon: IconBriefcase }
 	]
 
 	return (

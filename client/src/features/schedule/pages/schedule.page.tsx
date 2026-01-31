@@ -5,6 +5,7 @@ import 'dayjs/locale/ru'
 
 import { Button, ScheduleSkeleton } from '@/shared/kit'
 import { Layout } from '@/shared/widgets'
+import { useServices } from '@/shared/api/services/services'
 import { useScheduleForm } from '../hooks/useScheduleForm'
 import { isWeekday, isWeekend } from '../utils/schedule.utils'
 import { DayCard, ExactDatesSection } from '../components'
@@ -14,6 +15,7 @@ import s from './Schedule.module.scss'
 dayjs.locale('ru')
 
 const Schedule: FC = () => {
+	const { data: services = [] } = useServices(true) // включая неактивные для выбора
 	const {
 		days,
 		dayModes,
@@ -33,7 +35,7 @@ const Schedule: FC = () => {
 		removeTimeBlock,
 		copyDaySettings,
 		handleSubmit
-	} = useScheduleForm()
+	} = useScheduleForm(services)
 
 	const periodEnd = dayjs().add(Math.max(bookingRangeMonths - 1, 0), 'month')
 	const periodLabel = bookingRangeMonths <= 1
@@ -146,6 +148,7 @@ const Schedule: FC = () => {
 										copiedDayIndex={copiedDayIndex}
 										activeDays={activeDays}
 										allDays={days}
+										services={services}
 										onActiveChange={(active) => handleDayChange(index, 'isActive', active)}
 										onModeChange={(mode) => handleModeChange(index, day.dayOfWeek, mode)}
 										onTimeBlockChange={(blockIndex, field, value) => handleTimeBlockChange(index, blockIndex, field, value)}
@@ -174,6 +177,7 @@ const Schedule: FC = () => {
 										copiedDayIndex={copiedDayIndex}
 										activeDays={activeDays}
 										allDays={days}
+										services={services}
 										onActiveChange={(active) => handleDayChange(index, 'isActive', active)}
 										onModeChange={(mode) => handleModeChange(index, day.dayOfWeek, mode)}
 										onTimeBlockChange={(blockIndex, field, value) => handleTimeBlockChange(index, blockIndex, field, value)}

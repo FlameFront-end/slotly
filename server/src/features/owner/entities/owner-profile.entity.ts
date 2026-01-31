@@ -12,6 +12,7 @@ import {
 import type { User } from '../../auth/entities/user.entity';
 import type { Schedule } from '../../schedule/entities/schedule.entity';
 import type { Booking } from '../../bookings/entities/booking.entity';
+import type { Service } from '../../services/entities/service.entity';
 
 export interface ContactMethod {
   enabled: boolean;
@@ -101,4 +102,10 @@ export class OwnerProfile {
     (booking: Booking) => booking.ownerProfile,
   )
   bookings: Booking[];
+
+  @OneToMany(
+    () => require('../../services/entities/service.entity').Service,
+    (service: Service) => service.ownerProfile,
+  )
+  services: Service[];
 }

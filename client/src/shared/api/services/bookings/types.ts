@@ -9,6 +9,14 @@ export interface Booking {
   status: BookingStatus
   readAt: string | null
   createdAt: string
+  serviceId?: string | null
+  service?: {
+    id: string
+    name: string
+    description: string | null
+    duration: number
+    price: number | null
+  } | null
 }
 
 export interface CreateBookingPayload {
@@ -17,6 +25,7 @@ export interface CreateBookingPayload {
   date: string
   time: string
   ownerId?: string
+  serviceId?: string
 }
 
 export interface UpdateBookingStatusPayload {
@@ -30,6 +39,13 @@ export interface PublicBookingResponse {
   status: BookingStatus
   clientName: string
   clientContact: string
+  service: {
+    id: string
+    name: string
+    description: string | null
+    duration: number
+    price: number | null
+  } | null
   owner: {
     publicId: string
     name: string

@@ -11,7 +11,8 @@ const TITLE_MAP: Record<string, string> = {
 	[ROUTES.DASHBOARD]: 'Панель управления',
 	[ROUTES.PROFILE]: 'Профиль',
 	[ROUTES.SCHEDULE]: 'Расписание',
-	[ROUTES.BOOKINGS]: 'Записи'
+	[ROUTES.BOOKINGS]: 'Записи',
+	[ROUTES.SERVICES]: 'Услуги'
 }
 
 const getPageTitle = (pathname: string): string => {

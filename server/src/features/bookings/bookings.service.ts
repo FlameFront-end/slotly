@@ -8,6 +8,7 @@ import { Repository, Not, In, IsNull } from 'typeorm';
 import { Booking, BookingStatus } from './entities/booking.entity';
 import { OwnerProfile } from '../owner/entities/owner-profile.entity';
 import { Schedule } from '../schedule/entities/schedule.entity';
+import { Service } from '../services/entities/service.entity';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingStatusDto } from './dto/update-booking-status.dto';
 
@@ -20,6 +21,8 @@ export class BookingsService {
     private ownerProfileRepository: Repository<OwnerProfile>,
     @InjectRepository(Schedule)
     private scheduleRepository: Repository<Schedule>,
+    @InjectRepository(Service)
+    private serviceRepository: Repository<Service>,
   ) {}
 
   async findAll(
@@ -61,6 +64,7 @@ export class BookingsService {
     }
 
     queryBuilder
+      .leftJoinAndSelect('booking.service', 'service')
       .orderBy('booking.date', 'ASC')
       .addOrderBy('booking.time', 'ASC');
 
@@ -78,6 +82,7 @@ export class BookingsService {
 
     const booking = await this.bookingRepository.findOne({
       where: { id, ownerId: profile.id },
+      relations: ['service'],
     });
 
     if (!booking) {
@@ -116,12 +121,25 @@ export class BookingsService {
       createDto.time,
     );
 
+    // Валидируем услугу, если указана
+    let service: Service | null = null;
+    if (createDto.serviceId) {
+      service = await this.serviceRepository.findOne({
+        where: { id: createDto.serviceId, ownerId: profile.id, isActive: true },
+      });
+
+      if (!service) {
+        throw new BadRequestException('Услуга не найдена или неактивна');
+      }
+    }
+
     const booking = this.bookingRepository.create({
       ownerId: profile.id,
       clientName: createDto.clientName,
       clientContact: createDto.clientContact,
       date: createDto.date,
       time: createDto.time,
+      serviceId: service?.id ?? null,
       status: BookingStatus.PENDING,
     });
 

@@ -40,4 +40,13 @@ export class CreateBookingDto {
   @IsString()
   @IsOptional()
   ownerId?: string;
+
+  @ApiProperty({
+    example: 'uuid-of-service',
+    required: false,
+    description: 'ID услуги',
+  })
+  @IsString()
+  @IsOptional()
+  serviceId?: string;
 }

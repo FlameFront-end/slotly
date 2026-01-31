@@ -27,6 +27,7 @@ export class PublicController {
   @ApiOperation({ summary: 'Получить доступные слоты для бронирования' })
   @ApiQuery({ name: 'start_date', required: false, type: String })
   @ApiQuery({ name: 'end_date', required: false, type: String })
+  @ApiQuery({ name: 'service_id', required: false, type: String })
   @ApiResponse({ status: 200, description: 'Список доступных слотов' })
   @ApiResponse({ status: 404, description: 'Владелец не найден' })
   @ApiResponse({ status: 400, description: 'Неверный формат даты' })
@@ -34,8 +35,9 @@ export class PublicController {
     @Param('ownerId') ownerId: string,
     @Query('start_date') startDate?: string,
     @Query('end_date') endDate?: string,
+    @Query('service_id') serviceId?: string,
   ) {
-    return this.publicService.getAvailableSlots(ownerId, startDate, endDate);
+    return this.publicService.getAvailableSlots(ownerId, startDate, endDate, serviceId);
   }
 
   @Get('booking/:id')
@@ -54,5 +56,13 @@ export class PublicController {
   @ApiResponse({ status: 404, description: 'Запись не найдена' })
   async cancelByClient(@Param('id') id: string) {
     return this.publicService.cancelByClient(id);
+  }
+
+  @Get('owner/:ownerId/services')
+  @ApiOperation({ summary: 'Получить активные услуги владельца' })
+  @ApiResponse({ status: 200, description: 'Список услуг' })
+  @ApiResponse({ status: 404, description: 'Владелец не найден' })
+  async getServices(@Param('ownerId') ownerId: string) {
+    return this.publicService.getServices(ownerId);
   }
 }

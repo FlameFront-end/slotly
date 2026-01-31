@@ -13,6 +13,7 @@ export interface TimeBlock {
   startTime: string; // HH:mm
   endTime: string; // HH:mm
   slotDuration: number; // minutes
+  serviceId?: string | null; // ID услуги, доступной в этом временном блоке
 }
 
 export interface ScheduleDay {

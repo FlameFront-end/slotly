@@ -206,7 +206,7 @@
 	}
 
 	@media (min-width: 769px) {
-		grid-template-columns: 72px 110px 1fr;
+		grid-template-columns: 72px 110px 140px 1fr;
 		align-items: end;
 
 		:global(.mantine-Button-root) {
@@ -230,6 +230,15 @@
 .batchInput {
 	max-width: none;
 	width: 100%;
+}
+
+.batchServiceSelect {
+	max-width: none;
+	width: 100%;
+	
+	:global(.mantine-Select-input) {
+		font-size: 12px;
+	}
 }
 
 @keyframes fadeInUp {

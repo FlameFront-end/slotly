@@ -7,6 +7,7 @@ import dayjs from 'dayjs'
 import { useAvailableSlots } from '@/shared/api/services/schedule'
 import { useCreateBooking } from '@/shared/api/services/bookings'
 import { useOwnerProfileByPublicId } from '@/shared/api/services/owner'
+import { usePublicServices } from '@/shared/api/services/services'
 import { ROUTES } from '@/shared/model/routes'
 import { getErrorMessage, validateTelegram, validateEmail, validatePhone, formatPhoneNumber, formatTelegramValue } from '@/shared/lib'
 
@@ -18,6 +19,7 @@ export const usePublicBooking = () => {
   const queryClient = useQueryClient()
   const [selectedDate, setSelectedDate] = useState('')
   const [selectedTime, setSelectedTime] = useState('')
+  const [selectedServiceId, setSelectedServiceId] = useState<string>('')
   const [clientName, setClientName] = useState('')
   const [selectedContactMethod, setSelectedContactMethod] = useState<string>('')
   const [clientContact, setClientContact] = useState('')
@@ -27,10 +29,16 @@ export const usePublicBooking = () => {
   const startDate = dayjs().format('YYYY-MM-DD')
 
   const { data: ownerProfile, isLoading: isLoadingProfile } = useOwnerProfileByPublicId(ownerId || '')
-  const { data: slots, isLoading: isLoadingSlots } = useAvailableSlots(ownerId || '', startDate)
+  const { data: services, isLoading: isLoadingServices } = usePublicServices(ownerId || '')
+  const { data: slots, isLoading: isLoadingSlots } = useAvailableSlots(
+    ownerId || '',
+    startDate,
+    undefined,
+    selectedServiceId || undefined
+  )
   const createBookingMutation = useCreateBooking()
 
-  const isLoading = isLoadingProfile || isLoadingSlots
+  const isLoading = isLoadingProfile || isLoadingSlots || isLoadingServices
 
   const availableDates = useMemo(() => {
     return slots
@@ -183,7 +191,8 @@ export const usePublicBooking = () => {
         clientContact,
         date: selectedDate,
         time: selectedTime,
-        ownerId
+        ownerId,
+        serviceId: selectedServiceId || undefined
       })
 
       notifications.show({
@@ -226,11 +235,14 @@ export const usePublicBooking = () => {
   return {
     ownerProfile,
     slots,
+    services: services || [],
     isLoading,
     selectedDate,
     setSelectedDate,
     selectedTime,
     setSelectedTime,
+    selectedServiceId,
+    setSelectedServiceId,
     clientName,
     setClientName,
     selectedContactMethod,

@@ -2,13 +2,15 @@ import { type FC, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { notifications } from '@mantine/notifications'
 import { Card, Text, Badge } from '@mantine/core'
-import { IconCheck, IconCalendar, IconClock, IconUser, IconBuilding, IconCalendarPlus, IconX } from '@tabler/icons-react'
+import { IconCheck, IconCalendar, IconClock, IconUser, IconBuilding, IconCalendarPlus, IconX, IconBriefcase } from '@tabler/icons-react'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ru'
 
 import { BookingConfirmationSkeleton, EmptyState, Button, ConfirmModal } from '@/shared/kit'
 import { LocationInfo } from '@/shared/components/LocationInfo'
 import { usePublicBooking, useCancelPublicBooking } from '@/shared/api/services/bookings'
+import { formatServiceDuration, formatServicePrice } from '@/shared/utils/service.utils'
+import { calculateEndTime } from '@/shared/utils/time.utils'
 import { ROUTES } from '@/shared/model/routes'
 import { downloadIcsFile } from '@/shared/lib/calendar'
 
@@ -65,7 +67,10 @@ const BookingConfirmation: FC = () => {
 	}
 
 	const formattedDate = dayjs(booking.date).format('D MMMM YYYY, dddd')
-	const formattedTime = booking.time.slice(0, 5)
+	const startTime = booking.time.slice(0, 5)
+	const durationMinutes = booking.service?.duration || 60 // Дефолтная длительность 60 минут
+	const endTime = calculateEndTime(startTime, durationMinutes)
+	const formattedTime = `${startTime} - ${endTime}`
 	const canCancel = CAN_CANCEL_STATUSES.includes(booking.status as (typeof CAN_CANCEL_STATUSES)[number])
 	const isInactive = booking.status === 'cancelled' || booking.status === 'rejected'
 
@@ -126,12 +131,31 @@ const BookingConfirmation: FC = () => {
 								<dd>{formattedTime}</dd>
 							</div>
 							<div className={s.detailRow}>
-								<dt><IconUser size={18} stroke={1.5} className={s.detailIcon} /></dt>
-								<dd>{booking.clientName}</dd>
-							</div>
-							<div className={s.detailRow}>
 								<dt><IconBuilding size={18} stroke={1.5} className={s.detailIcon} /></dt>
 								<dd className={s.ownerName}>{booking.owner.name}</dd>
+							</div>
+							{booking.service && (
+								<div className={s.detailRow}>
+									<dt><IconBriefcase size={18} stroke={1.5} className={s.detailIcon} /></dt>
+									<dd className={s.serviceInfo}>
+										<span className={s.serviceName}>{booking.service.name}</span>
+										{(booking.service.duration || booking.service.price) && (
+											<span className={s.serviceMeta}>
+												{booking.service.duration && (
+													<span>{formatServiceDuration(booking.service.duration)}</span>
+												)}
+												{booking.service.duration && booking.service.price && <span> · </span>}
+												{booking.service.price && (
+													<span className={s.servicePrice}>{formatServicePrice(booking.service.price)}</span>
+												)}
+											</span>
+										)}
+									</dd>
+								</div>
+							)}
+							<div className={s.detailRow}>
+								<dt><IconUser size={18} stroke={1.5} className={s.detailIcon} /></dt>
+								<dd>{booking.clientName}</dd>
 							</div>
 						</dl>
 

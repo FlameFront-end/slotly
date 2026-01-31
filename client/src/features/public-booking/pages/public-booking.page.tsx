@@ -12,11 +12,14 @@ const PublicBooking: FC = () => {
 	const {
 		ownerProfile,
 		slots,
+		services,
 		isLoading,
 		selectedDate,
 		setSelectedDate,
 		selectedTime,
 		setSelectedTime,
+		selectedServiceId,
+		setSelectedServiceId,
 		clientName,
 		setClientName,
 		selectedContactMethod,
@@ -133,6 +136,7 @@ const PublicBooking: FC = () => {
 				<BookingForm
 					selectedDate={selectedDate}
 					selectedTime={selectedTime}
+					selectedServiceId={selectedServiceId}
 					clientName={clientName}
 					selectedContactMethod={selectedContactMethod}
 					clientContact={clientContact}
@@ -141,8 +145,10 @@ const PublicBooking: FC = () => {
 					availableTimes={availableTimes}
 					availableTimesWithEnd={availableTimesWithEnd}
 					availableContactMethods={availableContactMethods}
+					services={services}
 					onDateChange={setSelectedDate}
 					onTimeChange={setSelectedTime}
+					onServiceChange={setSelectedServiceId}
 					onNameChange={setClientName}
 					onContactMethodChange={value => {
 						setSelectedContactMethod(value)
