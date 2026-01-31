@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom'
+import { createBrowserRouter } from 'react-router-dom'
 
 import { ROUTES } from '@/shared/model/routes'
 
@@ -11,8 +11,8 @@ export const router = createBrowserRouter([
 		element: <AppRoutes />,
 		children: [
 			{
-				path: '/',
-				element: <Navigate to={ROUTES.DASHBOARD} replace />
+				path: ROUTES.LANDING,
+				lazy: () => import('../../features/landing/pages/landing.page')
 			},
 			{
 				path: ROUTES.LOGIN,

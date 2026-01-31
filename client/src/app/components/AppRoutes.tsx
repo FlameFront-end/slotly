@@ -13,6 +13,10 @@ export const AppRoutes = memo(() => {
 
 	usePageTitle()
 
+	if (location.pathname === ROUTES.LANDING) {
+		return <Outlet />
+	}
+
 	if (!authenticated && !location.pathname.startsWith('/auth/') && !location.pathname.startsWith('/public/')) {
 		return <Navigate to={ROUTES.LOGIN} state={{ from: location }} replace />
 	}

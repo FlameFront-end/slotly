@@ -6,6 +6,7 @@ import { ROUTES } from '@/shared/model/routes'
 const BASE_TITLE = 'Slotly'
 
 const TITLE_MAP: Record<string, string> = {
+	[ROUTES.LANDING]: 'Главная',
 	[ROUTES.LOGIN]: 'Вход',
 	[ROUTES.REGISTER]: 'Регистрация',
 	[ROUTES.DASHBOARD]: 'Панель управления',
