@@ -1,5 +1,5 @@
 import { type FC, useMemo, useState } from 'react'
-import { Text, Group, TextInput, ActionIcon, Collapse, UnstyledButton } from '@mantine/core'
+import { Text, Group, TextInput, ActionIcon, UnstyledButton } from '@mantine/core'
 import { DatePicker } from '@mantine/dates'
 import { IconTrash, IconChevronDown, IconChevronRight } from '@tabler/icons-react'
 import dayjs from 'dayjs'
@@ -73,7 +73,7 @@ export const ExactDatesSection: FC<ExactDatesSectionProps> = ({
 					</Text>
 				)}
 			</UnstyledButton>
-			<Collapse in={!collapsed}>
+			{!collapsed && (
 				<div className={s.grid}>
 				<div className={s.calendarCard}>
 					<DatePicker
@@ -133,7 +133,7 @@ export const ExactDatesSection: FC<ExactDatesSectionProps> = ({
 					)}
 				</div>
 				</div>
-			</Collapse>
+			)}
 		</div>
 	)
 }
